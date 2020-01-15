@@ -115,9 +115,7 @@ public class SharedElements {
 		cancelButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				previousStage.close();
 				editUserStage.close();
-				previousStage.show();
 			}
 		});
 		
