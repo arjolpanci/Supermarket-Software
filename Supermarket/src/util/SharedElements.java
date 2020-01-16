@@ -1,6 +1,8 @@
 package util;
 
 import data.UserIO;
+import employees.Admin;
+import employees.Cashier;
 import employees.User;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -10,6 +12,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
@@ -17,6 +20,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Modality;
@@ -139,6 +143,151 @@ public class SharedElements {
 		editUserStage.setScene(editUserScene);
 		editUserStage.showAndWait();
 
+	}
+	
+	public static void addUserView(Stage previousStage, UserIO uio) {
+		Stage addUserStage = new Stage();
+
+		//Layout stuff
+		VBox finalLayout = new VBox(40);
+		
+		StackPane header = new StackPane();
+		header.setPrefHeight(60);
+		header.setAlignment(Pos.CENTER);
+		header.setStyle("-fx-background-color: #074F76");
+		Label headerLabel = new Label("Add User");
+		headerLabel.setStyle("-fx-text-fill: White");
+		headerLabel.setFont(new Font(20));
+		header.getChildren().add(headerLabel);
+		
+		VBox fullLayout = new VBox(30);
+		fullLayout.setAlignment(Pos.CENTER);
+		HBox buttonArea = new HBox(20);
+		buttonArea.setAlignment(Pos.CENTER);
+		VBox dataArea = new VBox(22);
+		dataArea.setAlignment(Pos.CENTER);
+		
+		//Button stuff
+		FlatButton addButton = new FlatButton("Add");
+		FlatButton cancelButton = new FlatButton("Cancel");
+		buttonArea.getChildren().addAll(addButton, cancelButton);
+
+		//Setting up the data fields
+		ChoiceBox choiceField = new ChoiceBox();
+		choiceField.getStyleClass().add("combobox");
+		choiceField.setPrefWidth(200);
+		choiceField.getItems().add("Administrator");
+		choiceField.getItems().add("Cashier");
+		choiceField.getItems().add("Economist");
+		Label typeLabel = new Label("User Type: ");
+		HBox choiceArea = new HBox(20);
+		choiceArea.setAlignment(Pos.CENTER);
+		choiceArea.getChildren().addAll(typeLabel, choiceField);
+		
+		TextField nameTField = new TextField();
+		nameTField.getStyleClass().add("textfield");
+		nameTField.setPrefWidth(200);
+		nameTField.setPromptText("Enter Name ...");
+		Label nameLabel = new Label("First Name: ");
+		HBox nameArea = new HBox(20);
+		nameArea.setAlignment(Pos.CENTER);
+		nameArea.getChildren().addAll(nameLabel, nameTField);
+		
+		TextField surnameTField = new TextField();
+		surnameTField.getStyleClass().add("textfield");
+		surnameTField.setPrefWidth(200);
+		surnameTField.setPromptText("Enter Surname ...");
+		Label surnameLabel = new Label("Last Name: ");
+		HBox surnameArea = new HBox(20);
+		surnameArea.setAlignment(Pos.CENTER);
+		surnameArea.getChildren().addAll(surnameLabel, surnameTField);
+		
+		TextField usernameTField = new TextField();
+		usernameTField.getStyleClass().add("textfield");
+		usernameTField.setPrefWidth(200);
+		usernameTField.setPromptText("Enter Username ...");
+		Label usernameLabel = new Label("Username: ");
+		HBox usernameArea = new HBox(20);
+		usernameArea.setAlignment(Pos.CENTER);
+		usernameArea.getChildren().addAll(usernameLabel, usernameTField);
+		
+		TextField passwordTField = new TextField();
+		passwordTField.getStyleClass().add("textfield");
+		passwordTField.setPrefWidth(200);
+		passwordTField.setPromptText("Enter Password ...");
+		Label passwordLabel = new Label("Password: ");
+		HBox passwordArea = new HBox(20);
+		passwordArea.setAlignment(Pos.CENTER);
+		passwordArea.getChildren().addAll(passwordLabel, passwordTField);
+		
+		DatePicker birthdayField = new DatePicker();
+		Label dateLabel = new Label("Birthday: ");
+		HBox birthdayArea = new HBox(20);
+		birthdayArea.setAlignment(Pos.CENTER);
+		birthdayArea.getChildren().addAll(dateLabel, birthdayField);
+
+		//Button Functions
+		addButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				boolean flag = false;
+				try {
+					if(choiceField.getValue().equals(null) || nameTField.getText().equals("") || surnameTField.getText().equals("") ||
+							usernameTField.getText().equals("") || passwordTField.getText().equals("") || birthdayField.getValue().equals(null)) {
+						Alert al = new Alert(AlertType.ERROR, "Please fill in all the data", ButtonType.OK);
+						al.show();
+					}else {
+						String type = (String) choiceField.getValue();
+						switch (type) {
+						case "Administrator":
+							Admin adm = new Admin(nameTField.getText(), surnameTField.getText(), usernameTField.getText(),
+									passwordTField.getText(), new SimpleDate(birthdayField.getValue().getDayOfMonth(),
+											birthdayField.getValue().getMonthValue(), birthdayField.getValue().getYear()));
+							uio.addUser(adm);
+							flag = true;
+							break;
+						case "Cashier":
+							Cashier csh = new Cashier(nameTField.getText(), surnameTField.getText(), usernameTField.getText(),
+									passwordTField.getText(), new SimpleDate(birthdayField.getValue().getDayOfMonth(),
+											birthdayField.getValue().getMonthValue(), birthdayField.getValue().getYear()));
+							uio.addUser(csh);
+							flag = true;
+							break;
+						}
+					}	
+				}catch (Exception ex) {
+                	Alert al = new Alert(AlertType.ERROR, "Cannot process request", ButtonType.OK);
+                	al.show();
+				}
+
+				if(flag) {
+					Alert al = new Alert(AlertType.INFORMATION, "Action performed succesfully", ButtonType.OK);
+					al.show();
+				}
+				
+			}
+		});
+		
+		cancelButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent arg0) {
+				addUserStage.close();
+			}
+		});
+		
+		//Constructing the scene
+		dataArea.getChildren().addAll(choiceArea, nameArea, surnameArea, usernameArea, passwordArea, birthdayArea, buttonArea);
+		fullLayout.getChildren().addAll(dataArea, buttonArea);
+		finalLayout.getChildren().addAll(header, fullLayout);
+		Scene addUserScene = new Scene(finalLayout, 400,420);
+		addUserScene.getStylesheets().add("style.css");
+
+		addUserStage.setScene(addUserScene);
+		addUserStage.getIcons().add(SharedElements.getIcon().getImage());
+		addUserStage.initModality(Modality.APPLICATION_MODAL);
+		addUserStage.setTitle("Add User");
+		addUserStage.setResizable(false);
+		addUserStage.showAndWait();
 	}
 	
 	public static ImageView getIcon() {

@@ -67,40 +67,50 @@ public class AdminStage {
 		FlatButton incomeButton = new FlatButton("Income", incomeImg);
 		incomeButton.setPrefSize(100, 85);
 		
-		FlatButton editUserButton = new FlatButton("Edit");
-		FlatButton removeUserButton = new FlatButton("Remove");
-		FlatButton statsUserButton = new FlatButton("Statistics");
+		FlatButton addUserButton = new FlatButton("Add User");
+		FlatButton editUserButton = new FlatButton("Edit User");
+		FlatButton removeUserButton = new FlatButton("Remove User");
+		FlatButton statsUserButton = new FlatButton("View Statistics");
+
 		
+		
+		TableView tview = viewUsers(uio);
 		//Adding functions to buttons
 		usersButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent arg0) {
-				TableView tview = viewUsers(uio);
 				mainWindow.setBottom(usersbottomBar);
-				
-				editUserButton.setOnAction(new EventHandler<ActionEvent>() {
-					@Override
-					public void handle(ActionEvent arg0) {
-						try {
-							SharedElements.editUserView(adminStage, (User) tview.getSelectionModel().getSelectedItem(), uio);
-							mainPane.setContent(viewUsers(uio));
-						} catch (NullPointerException ex) {
-							Alert al = new Alert(AlertType.ERROR, "No user selected", ButtonType.OK);
-							al.show();
-						}
-					}
-				});
-				
 				mainPane.setContent(tview);
 			}
 		});
 		
-		topBar.getItems().addAll(usersButton, productsButton , incomeButton);
-		tbarButtonArea.getChildren().addAll(editUserButton, removeUserButton, statsUserButton);
-		mainWindow.setTop(topBar);
+		addUserButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent arg0) {
+				SharedElements.addUserView(adminStage, uio);
+				mainPane.setContent(viewUsers(uio));
+			}
+		});
 		
+		editUserButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent arg0) {
+				try {
+					SharedElements.editUserView(adminStage, (User) tview.getSelectionModel().getSelectedItem(), uio);
+					mainPane.setContent(viewUsers(uio));
+				} catch (NullPointerException ex) {
+					Alert al = new Alert(AlertType.ERROR, "No user selected", ButtonType.OK);
+					al.show();
+				}
+			}
+		});
+		
+		topBar.getItems().addAll(usersButton, productsButton , incomeButton);
+		tbarButtonArea.getChildren().addAll(addUserButton, editUserButton, removeUserButton, statsUserButton);
+		mainWindow.setTop(topBar);
 		Scene adminScene = new Scene(mainWindow, 1024, 576);
 		adminStage.setTitle("Admin Window");
+		adminStage.setResizable(false);
 		adminStage.setScene(adminScene);
 		adminStage.show();
 		

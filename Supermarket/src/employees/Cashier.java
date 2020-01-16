@@ -15,8 +15,7 @@ public class Cashier extends User implements IChecker, Serializable{
 
 	@Override
 	public boolean check(String user, String pw) {
-		
-		return false;
+		return (user.equals(this.getUsername()) && pw.equals(this.getPassword())) ? true : false;
 	}
 	
 }

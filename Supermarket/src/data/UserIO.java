@@ -10,8 +10,8 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 
 import employees.Admin;
-import employees.Cashier;
 import employees.User;
+import interfaces.IChecker;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
@@ -96,12 +96,7 @@ public class UserIO {
 	
 	public boolean checkUser(String user, String pw) {
 		for(User u : users) {
-			if(u instanceof Admin) {
-				if(((Admin) u).check(user, pw)) return true;
-			}
-			if(u instanceof Cashier) {
-				if(((Cashier) u).check(user, pw)) return true;
-			}
+			if( ((IChecker) u).check(user, pw) ) return true;
 		}
 		return false;
 	}
