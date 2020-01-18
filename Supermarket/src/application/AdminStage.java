@@ -4,6 +4,8 @@ import java.util.ArrayList;
 
 import data.UserIO;
 import employees.User;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
@@ -25,6 +27,9 @@ import util.FlatButton;
 import util.SharedElements;
 
 public class AdminStage {
+	
+	private ObservableList<User> users = FXCollections.observableArrayList();
+	private TableView data;
 	
 	public void view(Stage previousStage) {
 		UserIO uio = new UserIO();
@@ -74,13 +79,15 @@ public class AdminStage {
 
 		
 		
-		TableView tview = viewUsers(uio);
+		//TableView tview = viewUsers(uio);
+		data = viewUsers(uio);
 		//Adding functions to buttons
 		usersButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent arg0) {
 				mainWindow.setBottom(usersbottomBar);
-				mainPane.setContent(tview);
+				refresh(uio);
+				mainPane.setContent(data);
 			}
 		});
 		
@@ -88,7 +95,8 @@ public class AdminStage {
 			@Override
 			public void handle(ActionEvent arg0) {
 				SharedElements.addUserView(adminStage, uio);
-				mainPane.setContent(viewUsers(uio));
+				refresh(uio);
+				mainPane.setContent(data);
 			}
 		});
 		
@@ -96,8 +104,9 @@ public class AdminStage {
 			@Override
 			public void handle(ActionEvent arg0) {
 				try {
-					SharedElements.editUserView(adminStage, (User) tview.getSelectionModel().getSelectedItem(), uio);
-					mainPane.setContent(viewUsers(uio));
+					SharedElements.editUserView(adminStage, (User) data.getSelectionModel().getSelectedItem(), uio);
+					refresh(uio);
+					mainPane.setContent(data);
 				} catch (NullPointerException ex) {
 					Alert al = new Alert(AlertType.ERROR, "No user selected", ButtonType.OK);
 					al.show();
@@ -118,7 +127,6 @@ public class AdminStage {
 	
 	private TableView viewUsers(UserIO uio) {
 		TableView usersTable = new TableView();
-		
 		TableColumn<User, Integer> column1 = new TableColumn<>("Id");
         column1.setCellValueFactory(new PropertyValueFactory<>("id"));
         
@@ -139,17 +147,22 @@ public class AdminStage {
         
         TableColumn<User, String> column7 = new TableColumn<>("Birthday");
         column7.setCellValueFactory(new PropertyValueFactory<>("birthday"));
+       
+        usersTable.setItems(users);
         
-        ArrayList<User> users = uio.getUsers();
-        
-        for(User u : users) {
-        	usersTable.getItems().add(u);
-        }
-        usersTable.getColumns().addAll(column1, column2, column3, column4, column5, column6);
+        usersTable.getColumns().addAll(column1, column2, column3, column4, column5, column6, column7);
         usersTable.setPlaceholder(new Label("No user data to display"));
         usersTable.setPrefSize(1024, 491);
 		
 		return usersTable;
+	}
+	
+	private void refresh(UserIO uio) {
+		users.clear();
+		for(User u : uio.getUsers()) {
+			users.add(u);
+		}
+		data = viewUsers(uio);
 	}
 	
 }

@@ -98,9 +98,7 @@ public class SharedElements {
 					flag = true;
 				}
 				if(editBirthdayField.getValue() != null) {
-					user.setBirthday(new SimpleDate(editBirthdayField.getValue().getDayOfMonth(),
-							editBirthdayField.getValue().getMonthValue(),
-							editBirthdayField.getValue().getYear()));
+					user.setBirthday(new SimpleDate(editBirthdayField.getValue()));
 					flag = true;
 				}
 				
@@ -241,15 +239,13 @@ public class SharedElements {
 						switch (type) {
 						case "Administrator":
 							Admin adm = new Admin(nameTField.getText(), surnameTField.getText(), usernameTField.getText(),
-									passwordTField.getText(), new SimpleDate(birthdayField.getValue().getDayOfMonth(),
-											birthdayField.getValue().getMonthValue(), birthdayField.getValue().getYear()));
+									passwordTField.getText(), new SimpleDate(birthdayField.getValue()));
 							uio.addUser(adm);
 							flag = true;
 							break;
 						case "Cashier":
 							Cashier csh = new Cashier(nameTField.getText(), surnameTField.getText(), usernameTField.getText(),
-									passwordTField.getText(), new SimpleDate(birthdayField.getValue().getDayOfMonth(),
-											birthdayField.getValue().getMonthValue(), birthdayField.getValue().getYear()));
+									passwordTField.getText(), new SimpleDate(birthdayField.getValue()));
 							uio.addUser(csh);
 							flag = true;
 							break;
