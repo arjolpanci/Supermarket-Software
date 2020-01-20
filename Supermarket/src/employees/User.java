@@ -13,6 +13,7 @@ public abstract class User implements Serializable{
 	private String username;
 	private String password;
 	private SimpleDate birthday;
+	private int salary;
 	
 	public User(String name, String surname, String username, String password, SimpleDate birthday) {
 		this.setId(getId() + (int)(Math.random()*10));
@@ -44,5 +45,8 @@ public abstract class User implements Serializable{
 	
 	public SimpleDate getBirthday() { return birthday; }
 	public void setBirthday(SimpleDate birthday) { this.birthday = birthday; }
+
+	public int getSalary() { return salary; }
+	public void setSalary(int salary) { this.salary = salary; }
 
 }

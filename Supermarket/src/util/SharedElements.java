@@ -223,7 +223,16 @@ public class SharedElements {
 		HBox birthdayArea = new HBox(20);
 		birthdayArea.setAlignment(Pos.CENTER);
 		birthdayArea.getChildren().addAll(dateLabel, birthdayField);
-
+		
+		TextField salaryField = new TextField();
+		salaryField.getStyleClass().add("textfield");
+		salaryField.setPrefWidth(200);
+		salaryField.setPromptText("Enter Salary ...");
+		Label salaryLabel = new Label("Salary: ");
+		HBox salaryArea = new HBox(20);
+		salaryArea.setAlignment(Pos.CENTER);
+		salaryArea.getChildren().addAll(salaryLabel, salaryField);
+		
 		//Button Functions
 		addButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
@@ -231,7 +240,8 @@ public class SharedElements {
 				boolean flag = false;
 				try {
 					if(choiceField.getValue().equals(null) || nameTField.getText().equals("") || surnameTField.getText().equals("") ||
-							usernameTField.getText().equals("") || passwordTField.getText().equals("") || birthdayField.getValue().equals(null)) {
+							usernameTField.getText().equals("") || passwordTField.getText().equals("") || birthdayField.getValue().equals(null)
+							|| salaryField.getText().equals("")) {
 						Alert al = new Alert(AlertType.ERROR, "Please fill in all the data", ButtonType.OK);
 						al.show();
 					}else {
@@ -245,7 +255,7 @@ public class SharedElements {
 							break;
 						case "Cashier":
 							Cashier csh = new Cashier(nameTField.getText(), surnameTField.getText(), usernameTField.getText(),
-									passwordTField.getText(), new SimpleDate(birthdayField.getValue()));
+									passwordTField.getText(), new SimpleDate(birthdayField.getValue()), Integer.parseInt(salaryField.getText()));
 							uio.addUser(csh);
 							flag = true;
 							break;
@@ -272,10 +282,10 @@ public class SharedElements {
 		});
 		
 		//Constructing the scene
-		dataArea.getChildren().addAll(choiceArea, nameArea, surnameArea, usernameArea, passwordArea, birthdayArea, buttonArea);
+		dataArea.getChildren().addAll(choiceArea, nameArea, surnameArea, usernameArea, passwordArea, birthdayArea, salaryArea, buttonArea);
 		fullLayout.getChildren().addAll(dataArea, buttonArea);
 		finalLayout.getChildren().addAll(header, fullLayout);
-		Scene addUserScene = new Scene(finalLayout, 400,420);
+		Scene addUserScene = new Scene(finalLayout, 400,440);
 		addUserScene.getStylesheets().add("style.css");
 
 		addUserStage.setScene(addUserScene);

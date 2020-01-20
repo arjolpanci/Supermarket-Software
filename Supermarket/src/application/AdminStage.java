@@ -1,7 +1,5 @@
 package application;
 
-import java.util.ArrayList;
-
 import data.UserIO;
 import employees.User;
 import javafx.collections.FXCollections;
@@ -13,6 +11,8 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -20,8 +20,10 @@ import javafx.scene.control.ToolBar;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import util.FlatButton;
 import util.SharedElements;
@@ -44,9 +46,9 @@ public class AdminStage {
 		topBar.setPrefHeight(85);
 		topBar.setStyle("-fx-background-color: #074F76");
 		
-		HBox tbarButtonArea = new HBox(20);
+		HBox usersButtonTbar = new HBox(20);
 		ToolBar usersbottomBar = new ToolBar();
-		usersbottomBar.getItems().add(tbarButtonArea);
+		usersbottomBar.getItems().add(usersButtonTbar);
 		
 		//Setting up the button's images
 		ImageView userImg = new ImageView(new Image("resources\\user.png"));
@@ -78,8 +80,6 @@ public class AdminStage {
 		FlatButton statsUserButton = new FlatButton("View Statistics");
 
 		
-		
-		//TableView tview = viewUsers(uio);
 		data = viewUsers(uio);
 		//Adding functions to buttons
 		usersButton.setOnAction(new EventHandler<ActionEvent>() {
@@ -114,9 +114,39 @@ public class AdminStage {
 			}
 		});
 		
-		topBar.getItems().addAll(usersButton, productsButton , incomeButton);
-		tbarButtonArea.getChildren().addAll(addUserButton, editUserButton, removeUserButton, statsUserButton);
-		mainWindow.setTop(topBar);
+		removeUserButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent arg0) {
+				try {
+					User u = (User) data.getSelectionModel().getSelectedItem();
+					uio.removeUser(u);
+					refresh(uio);
+					mainPane.setContent(data);
+				} catch (NullPointerException ex) {
+					Alert al = new Alert(AlertType.ERROR, "No user selected", ButtonType.OK);
+					al.show();
+				}
+			}
+		});
+		
+		MenuBar menu = new MenuBar();
+		Menu logOut = new Menu();
+		Label logOutLabel = new Label("Log Out");
+		logOutLabel.setOnMouseClicked(new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent event) {
+				adminStage.close();
+				LoginStage lgs = new LoginStage();
+				lgs.start(previousStage);
+			}
+		});
+		logOut.setGraphic(logOutLabel);
+		menu.getMenus().add(logOut);
+		
+		topBar.getItems().addAll(usersButton, productsButton, incomeButton);
+		VBox top = new VBox(menu, topBar);
+		usersButtonTbar.getChildren().addAll(addUserButton, editUserButton, removeUserButton, statsUserButton);
+		mainWindow.setTop(top);
 		Scene adminScene = new Scene(mainWindow, 1024, 576);
 		adminStage.setTitle("Admin Window");
 		adminStage.setResizable(false);
@@ -147,10 +177,13 @@ public class AdminStage {
         
         TableColumn<User, String> column7 = new TableColumn<>("Birthday");
         column7.setCellValueFactory(new PropertyValueFactory<>("birthday"));
+        
+        TableColumn<User, String> column8 = new TableColumn<>("Salary");
+        column8.setCellValueFactory(new PropertyValueFactory<>("salary"));
        
         usersTable.setItems(users);
         
-        usersTable.getColumns().addAll(column1, column2, column3, column4, column5, column6, column7);
+        usersTable.getColumns().addAll(column1, column2, column3, column4, column5, column6, column7, column8);
         usersTable.setPlaceholder(new Label("No user data to display"));
         usersTable.setPrefSize(1024, 491);
 		

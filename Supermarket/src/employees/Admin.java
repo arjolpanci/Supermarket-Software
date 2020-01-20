@@ -10,6 +10,7 @@ public class Admin extends User implements IChecker, Serializable{
 	public Admin(String name, String surname, String username, String password, SimpleDate birthday) {
 		super(name, surname, username, password, birthday);
 		this.setUsertype("Administrator");
+		this.setSalary(0);
 	}
 
 	@Override

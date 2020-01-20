@@ -8,9 +8,10 @@ import util.SimpleDate;
 
 public class Cashier extends User implements IChecker, Serializable{
 	
-	public Cashier(String name, String surname, String username, String password, SimpleDate birthday) {
+	public Cashier(String name, String surname, String username, String password, SimpleDate birthday, int salary) {
 		super(name, surname, username, password, birthday);
 		this.setUsertype("Cashier");
+		this.setSalary(salary);
 	}
 
 	@Override
