@@ -4,6 +4,8 @@ import data.UserIO;
 import employees.Admin;
 import employees.Cashier;
 import employees.User;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Orientation;
@@ -154,6 +156,7 @@ public class SharedElements {
 		header.setAlignment(Pos.CENTER);
 		header.setStyle("-fx-background-color: #074F76");
 		Label headerLabel = new Label("Add User");
+		if(uio.isFirstTime()) headerLabel.setText("Add Administrator");
 		headerLabel.setStyle("-fx-text-fill: White");
 		headerLabel.setFont(new Font(20));
 		header.getChildren().add(headerLabel);
@@ -171,7 +174,7 @@ public class SharedElements {
 		buttonArea.getChildren().addAll(addButton, cancelButton);
 
 		//Setting up the data fields
-		ChoiceBox choiceField = new ChoiceBox();
+		ChoiceBox<String> choiceField = new ChoiceBox<String>();
 		choiceField.getStyleClass().add("combobox");
 		choiceField.setPrefWidth(200);
 		choiceField.getItems().add("Administrator");
@@ -181,6 +184,10 @@ public class SharedElements {
 		HBox choiceArea = new HBox(20);
 		choiceArea.setAlignment(Pos.CENTER);
 		choiceArea.getChildren().addAll(typeLabel, choiceField);
+		if(uio.isFirstTime()) {
+			choiceField.setValue("Administrator");
+			choiceField.setDisable(true);
+		}
 		
 		TextField nameTField = new TextField();
 		nameTField.getStyleClass().add("textfield");
@@ -232,6 +239,10 @@ public class SharedElements {
 		HBox salaryArea = new HBox(20);
 		salaryArea.setAlignment(Pos.CENTER);
 		salaryArea.getChildren().addAll(salaryLabel, salaryField);
+		if(uio.isFirstTime()) {
+			salaryField.setText("0");
+			salaryField.setDisable(true);
+		}
 		
 		//Button Functions
 		addButton.setOnAction(new EventHandler<ActionEvent>() {
@@ -245,11 +256,17 @@ public class SharedElements {
 						Alert al = new Alert(AlertType.ERROR, "Please fill in all the data", ButtonType.OK);
 						al.show();
 					}else {
-						String type = (String) choiceField.getValue();
+						String type = choiceField.getValue();
 						switch (type) {
 						case "Administrator":
 							Admin adm = new Admin(nameTField.getText(), surnameTField.getText(), usernameTField.getText(),
 									passwordTField.getText(), new SimpleDate(birthdayField.getValue()));
+							if(uio.isFirstTime()) {
+								adm.setId(1);
+								uio.addUser(adm);
+								addUserStage.close();
+								return;
+							}
 							uio.addUser(adm);
 							flag = true;
 							break;
@@ -268,7 +285,7 @@ public class SharedElements {
 
 				if(flag) {
 					Alert al = new Alert(AlertType.INFORMATION, "Action performed succesfully", ButtonType.OK);
-					al.show();
+					al.showAndWait();
 				}
 				
 			}
@@ -281,11 +298,24 @@ public class SharedElements {
 			}
 		});
 		
+		//Event handlers
+		choiceField.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue<? extends String> arg0, String arg1, String arg2) {
+				if(arg2.equals("Administrator")) {
+					salaryField.setText("0");
+					salaryField.setDisable(true);
+				}else {
+					salaryField.setDisable(false);
+				}
+			}
+		});
+		
 		//Constructing the scene
 		dataArea.getChildren().addAll(choiceArea, nameArea, surnameArea, usernameArea, passwordArea, birthdayArea, salaryArea, buttonArea);
 		fullLayout.getChildren().addAll(dataArea, buttonArea);
 		finalLayout.getChildren().addAll(header, fullLayout);
-		Scene addUserScene = new Scene(finalLayout, 400,440);
+		Scene addUserScene = new Scene(finalLayout, 400,460);
 		addUserScene.getStylesheets().add("style.css");
 
 		addUserStage.setScene(addUserScene);

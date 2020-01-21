@@ -1,6 +1,8 @@
 package application;
 
+import data.ProductIO;
 import data.UserIO;
+import employees.Admin;
 import employees.User;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -23,18 +25,23 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import products.Product;
 import util.FlatButton;
 import util.SharedElements;
 
 public class AdminStage {
 	
 	private ObservableList<User> users = FXCollections.observableArrayList();
-	private TableView data;
+	private ObservableList<Product> products = FXCollections.observableArrayList();
+	private TableView userData;
+	private TableView productData;
 	
 	public void view(Stage previousStage) {
 		UserIO uio = new UserIO();
+		ProductIO pio = new ProductIO();
 		
 		//Setting up the layout
 		Stage adminStage = new Stage();
@@ -80,14 +87,15 @@ public class AdminStage {
 		FlatButton statsUserButton = new FlatButton("View Statistics");
 
 		
-		data = viewUsers(uio);
-		//Adding functions to buttons
+		userData = viewUsers(uio);
+		
+		//Adding functions to User related buttons
 		usersButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent arg0) {
 				mainWindow.setBottom(usersbottomBar);
 				refresh(uio);
-				mainPane.setContent(data);
+				mainPane.setContent(userData);
 			}
 		});
 		
@@ -96,7 +104,7 @@ public class AdminStage {
 			public void handle(ActionEvent arg0) {
 				SharedElements.addUserView(adminStage, uio);
 				refresh(uio);
-				mainPane.setContent(data);
+				mainPane.setContent(userData);
 			}
 		});
 		
@@ -104,9 +112,9 @@ public class AdminStage {
 			@Override
 			public void handle(ActionEvent arg0) {
 				try {
-					SharedElements.editUserView(adminStage, (User) data.getSelectionModel().getSelectedItem(), uio);
+					SharedElements.editUserView(adminStage, (User) userData.getSelectionModel().getSelectedItem(), uio);
 					refresh(uio);
-					mainPane.setContent(data);
+					mainPane.setContent(userData);
 				} catch (NullPointerException ex) {
 					Alert al = new Alert(AlertType.ERROR, "No user selected", ButtonType.OK);
 					al.show();
@@ -118,16 +126,32 @@ public class AdminStage {
 			@Override
 			public void handle(ActionEvent arg0) {
 				try {
-					User u = (User) data.getSelectionModel().getSelectedItem();
+					User u = (User) userData.getSelectionModel().getSelectedItem();
+					if(u instanceof Admin && uio.getAdminsCount() <= 1) {
+						Alert al = new Alert(AlertType.ERROR, "Cannot delete the only admin", ButtonType.OK);
+						al.show();
+						return;
+					}
 					uio.removeUser(u);
 					refresh(uio);
-					mainPane.setContent(data);
+					mainPane.setContent(userData);
 				} catch (NullPointerException ex) {
 					Alert al = new Alert(AlertType.ERROR, "No user selected", ButtonType.OK);
 					al.show();
 				}
 			}
 		});
+		
+		//Adding functions to products related buttons
+		productsButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent arg0) {
+				mainWindow.setBottom(new Pane());
+				refresh(pio);
+				mainPane.setContent(productData);
+			}
+		});
+		
 		
 		MenuBar menu = new MenuBar();
 		Menu logOut = new Menu();
@@ -137,7 +161,7 @@ public class AdminStage {
 			public void handle(MouseEvent event) {
 				adminStage.close();
 				LoginStage lgs = new LoginStage();
-				lgs.start(previousStage);
+				lgs.view(previousStage, uio);
 			}
 		});
 		logOut.setGraphic(logOutLabel);
@@ -156,6 +180,7 @@ public class AdminStage {
 	}
 	
 	private TableView viewUsers(UserIO uio) {
+		
 		TableView usersTable = new TableView();
 		TableColumn<User, Integer> column1 = new TableColumn<>("Id");
         column1.setCellValueFactory(new PropertyValueFactory<>("id"));
@@ -188,6 +213,35 @@ public class AdminStage {
         usersTable.setPrefSize(1024, 491);
 		
 		return usersTable;
+		
+	}
+	
+	private TableView viewProducts(ProductIO uio) {
+	
+		TableView productsTable = new TableView();
+		TableColumn<Product, String> column1 = new TableColumn<>("Name");
+		column1.setCellValueFactory(new PropertyValueFactory<>("name"));
+		
+		TableColumn<Product, String> column2 = new TableColumn<>("Supplier");
+		column2.setCellValueFactory(new PropertyValueFactory<>("supplier"));
+		
+		TableColumn<Product, Integer> column3 = new TableColumn<>("Quantity");
+		column3.setCellValueFactory(new PropertyValueFactory<>("quantity"));
+		
+		TableColumn<Product, Integer> column4 = new TableColumn<>("Price");
+		column4.setCellValueFactory(new PropertyValueFactory<>("price"));
+		
+		TableColumn<Product, Integer> column5 = new TableColumn<>("Barcode");
+		column5.setCellValueFactory(new PropertyValueFactory<>("barcode"));
+		
+		productsTable.setItems(products);
+		
+		productsTable.getColumns().addAll(column1, column2, column3, column4, column5);
+		productsTable.setPlaceholder(new Label("No products data to display"));
+		productsTable.setPrefSize(1024, 491);
+		
+		return productsTable;
+		
 	}
 	
 	private void refresh(UserIO uio) {
@@ -195,7 +249,17 @@ public class AdminStage {
 		for(User u : uio.getUsers()) {
 			users.add(u);
 		}
-		data = viewUsers(uio);
+		userData = viewUsers(uio);
 	}
+	
+	private void refresh(ProductIO pio) {
+		products.clear();
+		for(Product p : pio.getProducts()) {
+			products.add(p);
+		}
+		productData = viewProducts(pio);
+	}
+	
+	
 	
 }

@@ -28,19 +28,24 @@ public class UserIO {
 		users = new ArrayList<User>();
 		file = new File(path);
 		file.getParentFile().mkdirs(); 
-		if(!file.exists()) {
-			Admin adm = new Admin("Admin", "Admin", "Admin", "Admin", new SimpleDate(27,06,2000));
-			adm.setId(1);
-			users.add(adm);
-			write();
+		if(file.exists()) {
 			isFirstTime = false;
-		}else {
 			read();
 		}
 	}
 	
+	public boolean isFirstTime() { return isFirstTime; }
+
 	public ArrayList<User> getUsers() {
 		return users;
+	}
+	
+	public int getAdminsCount() {
+		int cnt = 0;
+		for(User u : users) {
+			if(u instanceof Admin) cnt++;
+		}
+		return cnt;
 	}
 	
 	public void addUser(User user) {
@@ -92,6 +97,11 @@ public class UserIO {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public void update() {
+		write();
+		isFirstTime = false;
 	}
 	
 	public boolean checkUser(String user, String pw) {
