@@ -58,7 +58,7 @@ public class AdminStage {
 		usersbottomBar.setStyle("-fx-background-color: #074F76");
 		usersbottomBar.getItems().add(usersButtonTbar);
 		
-		//Setting up the button's images
+		//Setting up the button's images for top toolbar
 		ImageView userImg = new ImageView(new Image("resources\\man.png"));
 		userImg.setFitHeight(50);
 		userImg.setFitWidth(50);
@@ -74,7 +74,7 @@ public class AdminStage {
 		incomeImg.setFitWidth(50);
 		incomeImg.setPreserveRatio(true);
 		
-		//Setting up the buttons
+		//Setting up the buttons for User View
 		FlatButton usersButton = new FlatButton("Users", userImg);
 		usersButton.setPrefSize(100, 85);
 		FlatButton productsButton = new FlatButton("Products", productsImg);
@@ -86,9 +86,18 @@ public class AdminStage {
 		FlatButton editUserButton = new FlatButton("Edit User");
 		FlatButton removeUserButton = new FlatButton("Remove User");
 		FlatButton statsUserButton = new FlatButton("View Statistics");
+		
+		
+		//Setting up buttons for Product View
+		FlatButton addProductButton = new FlatButton("Add Product");
+		FlatButton editProductButton = new FlatButton("Edit Product");
+		FlatButton removeProductButton = new FlatButton("Remove Product");
+		ToolBar productsTBar = new ToolBar();
+		productsTBar.getItems().addAll(addProductButton, editProductButton, removeProductButton);
 
 		
 		userData = viewUsers(uio);
+		productData = viewProducts(pio);
 		
 		//Adding functions to User related buttons
 		usersButton.setOnAction(new EventHandler<ActionEvent>() {
@@ -143,11 +152,21 @@ public class AdminStage {
 			}
 		});
 		
+		
 		//Adding functions to products related buttons
 		productsButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent arg0) {
-				mainWindow.setBottom(new Pane());
+				mainWindow.setBottom(productsTBar);
+				refresh(pio);
+				mainPane.setContent(productData);
+			}
+		});
+		
+		addProductButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent arg0) {
+				SharedElements.addProductView(adminStage, pio);
 				refresh(pio);
 				mainPane.setContent(productData);
 			}
@@ -176,6 +195,7 @@ public class AdminStage {
 		adminStage.setTitle("Admin Window");
 		//adminStage.setResizable(false);
 		adminStage.setScene(adminScene);
+		mainWindow.requestFocus();
 		adminStage.show();
 		
 	}

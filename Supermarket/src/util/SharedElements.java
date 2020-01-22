@@ -2,6 +2,7 @@ package util;
 
 import java.io.File;
 
+import data.ProductIO;
 import data.UserIO;
 import employees.Admin;
 import employees.Cashier;
@@ -29,6 +30,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import products.Product;
 
 public class SharedElements {
 	
@@ -326,6 +328,117 @@ public class SharedElements {
 		addUserStage.setTitle("Add User");
 		addUserStage.setResizable(false);
 		addUserStage.showAndWait();
+	}
+	
+	public static void addProductView(Stage previousStage, ProductIO pio) {
+		Stage addProductStage = new Stage();
+
+		//Layout stuff
+		VBox finalLayout = new VBox(40);
+		
+		StackPane header = new StackPane();
+		header.setPrefHeight(60);
+		header.setAlignment(Pos.CENTER);
+		header.setStyle("-fx-background-color: #074F76");
+		Label headerLabel = new Label("Add Product");
+		headerLabel.setStyle("-fx-text-fill: White");
+		headerLabel.setFont(new Font(20));
+		header.getChildren().add(headerLabel);
+		
+		VBox fullLayout = new VBox(30);
+		fullLayout.setAlignment(Pos.CENTER);
+		HBox buttonArea = new HBox(20);
+		buttonArea.setAlignment(Pos.CENTER);
+		VBox dataArea = new VBox(22);
+		dataArea.setAlignment(Pos.CENTER);
+		
+		//Button stuff
+		FlatButton addButton = new FlatButton("Add");
+		FlatButton cancelButton = new FlatButton("Cancel");
+		buttonArea.getChildren().addAll(addButton, cancelButton);
+
+		//Setting up the data fields
+		
+		TextField nameTField = new TextField();
+		nameTField.getStyleClass().add("textfield");
+		nameTField.setPrefWidth(200);
+		nameTField.setPromptText("Enter Name ...");
+		Label nameLabel = new Label("First Name: ");
+		HBox nameArea = new HBox(20);
+		nameArea.setAlignment(Pos.CENTER);
+		nameArea.getChildren().addAll(nameLabel, nameTField);
+		
+		TextField supplierTField = new TextField();
+		supplierTField.getStyleClass().add("textfield");
+		supplierTField.setPrefWidth(200);
+		supplierTField.setPromptText("Enter Supplier ...");
+		Label supplierLabel = new Label("Supplier: ");
+		HBox supplierArea = new HBox(20);
+		supplierArea.setAlignment(Pos.CENTER);
+		supplierArea.getChildren().addAll(supplierLabel, supplierTField);
+		
+		TextField quantityTField = new TextField();
+		quantityTField.getStyleClass().add("textfield");
+		quantityTField.setPrefWidth(200);
+		quantityTField.setPromptText("Enter Quantity ...");
+		Label quantityLabel = new Label("Quantity: ");
+		HBox quantityArea = new HBox(20);
+		quantityArea.setAlignment(Pos.CENTER);
+		quantityArea.getChildren().addAll(quantityLabel, quantityTField);
+		
+		TextField priceTField = new TextField();
+		priceTField.getStyleClass().add("textfield");
+		priceTField.setPrefWidth(200);
+		priceTField.setPromptText("Enter Selling Price ...");
+		Label priceLabel = new Label("Price: ");
+		HBox priceArea = new HBox(20);
+		priceArea.setAlignment(Pos.CENTER);
+		priceArea.getChildren().addAll(priceLabel, priceTField);
+
+		TextField barcodeTField = new TextField();
+		barcodeTField.getStyleClass().add("textfield");
+		barcodeTField.setPrefWidth(200);
+		barcodeTField.setPromptText("Enter Barcode ...");
+		Label barcodeLabel = new Label("Barcode: ");
+		HBox barcodeArea = new HBox(20);
+		barcodeArea.setAlignment(Pos.CENTER);
+		barcodeArea.getChildren().addAll(barcodeLabel, barcodeTField);
+		
+		dataArea.getChildren().addAll(nameArea, supplierArea, quantityArea, priceArea, barcodeArea, buttonArea);
+		fullLayout.getChildren().addAll(dataArea, buttonArea);
+		finalLayout.getChildren().addAll(header, fullLayout);
+		Scene addProductScene = new Scene(finalLayout, 400,460);
+		addProductScene.getStylesheets().add("style.css");
+		
+		
+		//Adding functions to buttons
+		addButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				String name = nameTField.getText();
+				String supplier = supplierTField.getText();
+				int quantity = Integer.parseInt(quantityTField.getText());
+				int price = Integer.parseInt(priceTField.getText());
+				int barcode = Integer.parseInt(barcodeTField.getText());
+				pio.addProduct(new Product(name, supplier, quantity, price, barcode));
+				Alert al = new Alert(AlertType.INFORMATION, "Action performed succesfully", ButtonType.OK);
+				al.showAndWait();
+			}
+		});
+		
+		cancelButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent arg0) {
+				addProductStage.close();
+			}
+		});
+
+		addProductStage.setScene(addProductScene);
+		addProductStage.getIcons().add(SharedElements.getIcon().getImage());
+		addProductStage.initModality(Modality.APPLICATION_MODAL);
+		addProductStage.setTitle("Add Product");
+		addProductStage.setResizable(false);
+		addProductStage.showAndWait();
 	}
 	
 	public static ImageView getIcon() {

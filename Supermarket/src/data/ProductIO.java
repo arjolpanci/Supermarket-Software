@@ -42,11 +42,11 @@ public class ProductIO {
 						+ "only quantity has been added", ButtonType.OK);
 				al.show();
 				write();
-			}else {
-				products.add(product);
-				write();
+				return;
 			}
 		}
+		products.add(product);
+		write();
 	}
 
 	private void write() {
