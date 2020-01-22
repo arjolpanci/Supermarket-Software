@@ -104,10 +104,10 @@ public class UserIO {
 		isFirstTime = false;
 	}
 	
-	public boolean checkUser(String user, String pw) {
+	public User checkUser(String user, String pw) {
 		for(User u : users) {
-			if( ((IChecker) u).check(user, pw) ) return true;
+			if( ((IChecker) u).check(user, pw) ) return u;
 		}
-		return false;
+		return null;
 	}
 }

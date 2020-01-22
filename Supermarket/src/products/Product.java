@@ -17,6 +17,10 @@ public class Product implements Serializable{
 		this.price = price;
 		this.barcode = barcode;
 	}
+	
+	public int getPriceForQuantity(int qty) {
+		return qty * price;
+	}
 
 	public String getName() { return name; }
 	public void setName(String name) { this.name = name; }

@@ -55,15 +55,16 @@ public class AdminStage {
 		
 		HBox usersButtonTbar = new HBox(20);
 		ToolBar usersbottomBar = new ToolBar();
+		usersbottomBar.setStyle("-fx-background-color: #074F76");
 		usersbottomBar.getItems().add(usersButtonTbar);
 		
 		//Setting up the button's images
-		ImageView userImg = new ImageView(new Image("resources\\user.png"));
+		ImageView userImg = new ImageView(new Image("resources\\man.png"));
 		userImg.setFitHeight(50);
 		userImg.setFitWidth(50);
 		userImg.setPreserveRatio(true);
 		
-		ImageView productsImg = new ImageView(new Image("resources\\products.png"));
+		ImageView productsImg = new ImageView(new Image("resources\\cart.png"));
 		productsImg.setFitHeight(50);
 		productsImg.setFitWidth(50);
 		productsImg.setPreserveRatio(true);
@@ -173,7 +174,7 @@ public class AdminStage {
 		mainWindow.setTop(top);
 		Scene adminScene = new Scene(mainWindow, 1024, 576);
 		adminStage.setTitle("Admin Window");
-		adminStage.setResizable(false);
+		//adminStage.setResizable(false);
 		adminStage.setScene(adminScene);
 		adminStage.show();
 		
@@ -210,7 +211,7 @@ public class AdminStage {
         
         usersTable.getColumns().addAll(column1, column2, column3, column4, column5, column6, column7, column8);
         usersTable.setPlaceholder(new Label("No user data to display"));
-        usersTable.setPrefSize(1024, 491);
+        usersTable.setPrefSize(1600, 1200);
 		
 		return usersTable;
 		
@@ -238,7 +239,7 @@ public class AdminStage {
 		
 		productsTable.getColumns().addAll(column1, column2, column3, column4, column5);
 		productsTable.setPlaceholder(new Label("No products data to display"));
-		productsTable.setPrefSize(1024, 491);
+		productsTable.setPrefSize(1600, 1200);
 		
 		return productsTable;
 		

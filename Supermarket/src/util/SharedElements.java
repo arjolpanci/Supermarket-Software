@@ -1,5 +1,7 @@
 package util;
 
+import java.io.File;
+
 import data.UserIO;
 import employees.Admin;
 import employees.Cashier;
@@ -333,6 +335,15 @@ public class SharedElements {
 		logoImg.setPreserveRatio(true);
 		logoImg.setImage(new Image("resources\\logo.png"));
 		return logoImg;
+	}
+	
+	public static ImageView getSearchIcon() {
+		ImageView searchImgView = new ImageView();
+		searchImgView.setFitHeight(20);
+		searchImgView.setFitWidth(20);
+		searchImgView.setPreserveRatio(true);
+		searchImgView.setImage(new Image("resources" + File.separator + "search.png"));
+		return searchImgView;
 	}
 
 

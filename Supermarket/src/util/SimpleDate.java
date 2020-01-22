@@ -2,6 +2,7 @@ package util;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class SimpleDate implements Serializable{
 	
@@ -16,6 +17,12 @@ public class SimpleDate implements Serializable{
 	}
 	
 	public SimpleDate(LocalDate date) {
+		this.day = date.getDayOfMonth();
+		this.month = date.getMonthValue();
+		this.year = date.getYear();
+	}
+	
+	public SimpleDate(LocalDateTime date) {
 		this.day = date.getDayOfMonth();
 		this.month = date.getMonthValue();
 		this.year = date.getYear();

@@ -1,6 +1,9 @@
 package application;
 
 import data.UserIO;
+import employees.Admin;
+import employees.Cashier;
+import employees.User;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -111,9 +114,14 @@ public class LoginStage {
         loginButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent arg0) {
-				if(uio.checkUser(userTField.getText(), pwTField.getText())) {
+				User user = uio.checkUser(userTField.getText(), pwTField.getText());
+				if(user instanceof Admin) {
 					AdminStage adminStage = new AdminStage();
 					adminStage.view(loginStage);
+					loginStage.close();
+				}else if(user instanceof Cashier){
+					CashierStage cashierStage = new CashierStage();
+					cashierStage.view(loginStage, (Cashier) user);
 					loginStage.close();
 				}else {
 					Alert al = new Alert(AlertType.ERROR, "No user exists with the given data", ButtonType.OK);

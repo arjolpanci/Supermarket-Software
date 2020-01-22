@@ -8,3 +8,37 @@
     -fx-background-insets: 0 0 -1 0, 0, 1, 2;
     -fx-background-radius: 3px, 3px, 2px, 1px;
 }
+
+.custom-button {
+	-fx-border-color: #074F76;
+    -fx-border-width: 0;
+    -fx-background-radius: 15;
+    -fx-background-color: #074F76;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 14;
+}
+
+.custom-button:hover {
+    -fx-border-color: #04314A;
+    -fx-background-color: #04314A;
+    -fx-border-radius: 15;
+    -fx-font-weight: bold;
+    -fx-font-size: 14;
+}
+
+.custom-button:focused {
+    -fx-border-color: #04314A;
+    -fx-background-color: #04314A;
+    -fx-border-radius: 15;
+    -fx-font-weight: bold;
+    -fx-font-size: 14;
+}
+
+.custom-button:pressed {
+    -fx-background-color: black;
+    -fx-text-fill: white;
+    -fx-border-radius: 15;
+    -fx-font-weight: bold;
+    -fx-font-size: 14;
+}
