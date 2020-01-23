@@ -34,19 +34,38 @@ public class ProductIO {
 		return products;
 	}
 	
-	public void addProduct(Product product) {
+	public Product getProductFromName(String name) {
 		for(Product p : products) {
-			if(product.equals(p)) {
-				p.setQuantity(p.getQuantity()+1);
+			if(p.getName().equals(name)) return p;
+		}
+		return null;
+	}
+	
+	public void addProduct(Product product) {
+		boolean flag = true;
+		for(Product p : products) {
+			if(product.equals(p) || product.getName().equals(p.getName()) || product.getSupplier().equals(p.getSupplier())) {
+				products.remove(p);
+				p.setQuantity(product.getQuantity());
+				p.setPrice(product.getPrice());
 				Alert al = new Alert(AlertType.INFORMATION, "That product was already on stock, "
-						+ "only quantity has been added", ButtonType.OK);
+						+ "only quantity\\price has been changed", ButtonType.OK);
 				al.show();
+				products.add(p);
 				write();
-				return;
+				flag = false;
 			}
 		}
-		products.add(product);
-		write();
+		if(flag) {
+			products.add(product);
+			write();
+		}
+	}
+	
+	public void update() { write(); }
+	
+	public void removeProduct(Product product) {
+		products.remove(product);
 	}
 
 	private void write() {

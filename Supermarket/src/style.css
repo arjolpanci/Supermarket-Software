@@ -3,12 +3,6 @@
 	-fx-background-insets: 0, 0 0 1 0;
 }
 
-.combobox {
-    -fx-background-color: -fx-shadow-highlight-color, -fx-outer-border, -fx-inner-border, white;
-    -fx-background-insets: 0 0 -1 0, 0, 1, 2;
-    -fx-background-radius: 3px, 3px, 2px, 1px;
-}
-
 .custom-button {
 	-fx-border-color: #074F76;
     -fx-border-width: 0;

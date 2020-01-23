@@ -3,8 +3,8 @@ package application;
 import data.UserIO;
 import employees.Admin;
 import employees.Cashier;
+import employees.Economist;
 import employees.User;
-import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
@@ -121,7 +121,11 @@ public class LoginStage {
 					loginStage.close();
 				}else if(user instanceof Cashier){
 					CashierStage cashierStage = new CashierStage();
-					cashierStage.view(loginStage, (Cashier) user);
+					cashierStage.view(loginStage, (Cashier) user, uio);
+					loginStage.close();
+				}else if(user instanceof Economist){
+					EconomistStage economistStage = new EconomistStage();
+					economistStage.view(loginStage);
 					loginStage.close();
 				}else {
 					Alert al = new Alert(AlertType.ERROR, "No user exists with the given data", ButtonType.OK);

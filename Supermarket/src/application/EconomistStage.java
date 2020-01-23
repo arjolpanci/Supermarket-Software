@@ -12,19 +12,16 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.ToolBar;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -33,7 +30,7 @@ import products.Product;
 import util.FlatButton;
 import util.SharedElements;
 
-public class AdminStage {
+public class EconomistStage {
 	
 	private ObservableList<User> users = FXCollections.observableArrayList();
 	private ObservableList<Product> products = FXCollections.observableArrayList();
@@ -45,20 +42,20 @@ public class AdminStage {
 		ProductIO pio = new ProductIO();
 		
 		//Setting up the layout
-		Stage adminStage = new Stage();
-		adminStage.getIcons().add(SharedElements.getIcon().getImage());
+		Stage economistStage = new Stage();
+		economistStage.getIcons().add(SharedElements.getIcon().getImage());
 		ScrollPane mainPane = new ScrollPane();
 		BorderPane mainWindow = new BorderPane();
 		mainWindow.setCenter(mainPane);
 		ToolBar topBar = new ToolBar();
 		topBar.setPrefHeight(85);
 		topBar.setStyle("-fx-background-color: #074F76");
-		
+			
 		HBox usersButtonTbar = new HBox(20);
 		ToolBar usersbottomBar = new ToolBar();
 		usersbottomBar.setStyle("-fx-background-color: #074F76");
 		usersbottomBar.getItems().add(usersButtonTbar);
-		
+			
 		//Setting up the button's images for top toolbar
 		ImageView userImg = new ImageView(new Image("resources" + File.separator + "man.png"));
 		userImg.setFitHeight(50);
@@ -69,19 +66,19 @@ public class AdminStage {
 		productsImg.setFitHeight(50);
 		productsImg.setFitWidth(50);
 		productsImg.setPreserveRatio(true);
-		
+			
 		ImageView incomeImg = new ImageView(new Image("resources" + File.separator + "money.png"));
 		incomeImg.setFitHeight(50);
 		incomeImg.setFitWidth(50);
 		incomeImg.setPreserveRatio(true);
-		
+			
 		ImageView logoutIV = new ImageView();
 		logoutIV.setFitHeight(50);
 		logoutIV.setFitWidth(50);
 		logoutIV.setPreserveRatio(true);
 		logoutIV.setImage(new Image("resources" + File.separator + "logout.png"));
-		
-		
+			
+			
 		//Setting up the buttons for User View
 		FlatButton usersButton = new FlatButton("Users", userImg);
 		usersButton.setPrefSize(100, 85);
@@ -92,9 +89,6 @@ public class AdminStage {
 		FlatButton logOutButton = new FlatButton("Log Out", logoutIV);
 		logOutButton.setPrefSize(120, 85);
 		
-		FlatButton addUserButton = new FlatButton("Add User");
-		FlatButton editUserButton = new FlatButton("Edit User");
-		FlatButton removeUserButton = new FlatButton("Remove User");
 		FlatButton statsUserButton = new FlatButton("View Statistics");
 		
 		
@@ -105,12 +99,10 @@ public class AdminStage {
 		ToolBar productsTBar = new ToolBar();
 		productsTBar.setStyle("-fx-background-color: #074F76");
 		productsTBar.getItems().addAll(addProductButton, editProductButton, removeProductButton);
-
-		
+			
 		userData = viewUsers(uio);
 		productData = viewProducts(pio);
-		
-		
+			
 		//Adding top toolbar button's functions
 		usersButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
@@ -120,7 +112,7 @@ public class AdminStage {
 				mainPane.setContent(userData);
 			}
 		});
-		
+				
 		productsButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent arg0) {
@@ -129,71 +121,26 @@ public class AdminStage {
 				mainPane.setContent(productData);
 			}
 		});
-		
+			
 		logOutButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent arg0) {
-				adminStage.close();
+				economistStage.close();
 				LoginStage lgs = new LoginStage();
-				lgs.view(adminStage, uio);
+				lgs.view(economistStage, uio);
 			}
 		});
-		
-		//Adding functions to User related buttons
-		addUserButton.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent arg0) {
-				SharedElements.addUserView(adminStage, uio);
-				refresh(uio);
-				mainPane.setContent(userData);
-			}
-		});
-		
-		editUserButton.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent arg0) {
-				try {
-					SharedElements.editUserView(adminStage, (User) userData.getSelectionModel().getSelectedItem(), uio);
-					refresh(uio);
-					mainPane.setContent(userData);
-				} catch (NullPointerException ex) {
-					Alert al = new Alert(AlertType.ERROR, "No user selected", ButtonType.OK);
-					al.show();
-				}
-			}
-		});
-		
-		removeUserButton.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent arg0) {
-				try {
-					User u = (User) userData.getSelectionModel().getSelectedItem();
-					if(u instanceof Admin && uio.getAdminsCount() <= 1) {
-						Alert al = new Alert(AlertType.ERROR, "Cannot delete the only admin", ButtonType.OK);
-						al.show();
-						return;
-					}
-					uio.removeUser(u);
-					refresh(uio);
-					mainPane.setContent(userData);
-				} catch (NullPointerException ex) {
-					Alert al = new Alert(AlertType.ERROR, "No user selected", ButtonType.OK);
-					al.show();
-				}
-			}
-		});
-		
 		
 		//Adding functions to products related buttons
 		addProductButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent arg0) {
-				SharedElements.addProductView(adminStage, pio);
+				SharedElements.addProductView(economistStage, pio);
 				refresh(pio);
 				mainPane.setContent(productData);
 			}
 		});
-		
+			
 		editProductButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent arg0) {
@@ -208,7 +155,7 @@ public class AdminStage {
 				}
 			}
 		});
-		
+			
 		removeProductButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent arg0) {
@@ -219,36 +166,17 @@ public class AdminStage {
 				mainPane.setContent(productData);
 			}
 		});
-		
-
-		
-		
-		MenuBar menu = new MenuBar();
-		Menu logOut = new Menu();
-		Label logOutLabel = new Label("Log Out");
-		logOutLabel.setOnMouseClicked(new EventHandler<MouseEvent>() {
-			@Override
-			public void handle(MouseEvent event) {
-				adminStage.close();
-				LoginStage lgs = new LoginStage();
-				lgs.view(previousStage, uio);
-			}
-		});
-		logOut.setGraphic(logOutLabel);
-		menu.getMenus().add(logOut);
-		
+			
+			
 		topBar.getItems().addAll(usersButton, productsButton, incomeButton, logOutButton);
-		VBox top = new VBox(menu, topBar);
-		usersButtonTbar.getChildren().addAll(addUserButton, editUserButton, removeUserButton, statsUserButton);
-		mainWindow.setTop(top);
-		Scene adminScene = new Scene(mainWindow, 1024, 576);
-		adminScene.getStylesheets().add("style.css");
-		adminStage.setTitle("Admin Window");
-		//adminStage.setResizable(false);
-		adminStage.setScene(adminScene);
+		usersButtonTbar.getChildren().addAll(statsUserButton);
+		mainWindow.setTop(topBar);
+		Scene economistScene = new Scene(mainWindow, 1024, 576);
+		economistScene.getStylesheets().add("style.css");
+		economistStage.setTitle("Economist Window");
+		economistStage.setScene(economistScene);
 		mainWindow.requestFocus();
-		adminStage.show();
-		
+		economistStage.show();			
 	}
 	
 	private TableView viewUsers(UserIO uio) {
@@ -331,5 +259,4 @@ public class AdminStage {
 		}
 		productData = viewProducts(pio);
 	}
-	
 }

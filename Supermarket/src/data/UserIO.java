@@ -20,7 +20,7 @@ import util.SimpleDate;
 public class UserIO {
 	
 	private ArrayList<User> users;
-	private String path = "files\\users.bin";
+	private String path = "files" + File.separator + "users.bin";
 	private File file;
 	private boolean isFirstTime = true;
 	
@@ -38,6 +38,14 @@ public class UserIO {
 
 	public ArrayList<User> getUsers() {
 		return users;
+	}
+	
+	private int getId() {
+		int id = 0;
+		if(users.size() != 0) {
+			id = users.get(users.size()-1).getId();
+		}
+		return ++id;
 	}
 	
 	public int getAdminsCount() {
@@ -60,6 +68,7 @@ public class UserIO {
 				return;
 			}
 		}
+		user.setId(getId());
 		users.add(user);
 		write();
 	}

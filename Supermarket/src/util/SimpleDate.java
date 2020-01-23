@@ -27,6 +27,11 @@ public class SimpleDate implements Serializable{
 		this.month = date.getMonthValue();
 		this.year = date.getYear();
 	}
+	
+	public LocalDate toLocalDate() {
+		LocalDate d = LocalDate.of(year, month, day);
+		return d;
+	}
 
 	public int getDay() {
 		return day;

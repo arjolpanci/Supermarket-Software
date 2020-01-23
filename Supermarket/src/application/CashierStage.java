@@ -1,8 +1,11 @@
 package application;
 
 import java.io.File;
+import java.util.ArrayList;
 
+import data.Bill;
 import data.ProductIO;
+import data.UserIO;
 import employees.Cashier;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -24,11 +27,12 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import products.Product;
 import util.FlatButton;
+import util.NotEnoughQuantityException;
 import util.SharedElements;
 
 public class CashierStage {
@@ -36,9 +40,10 @@ public class CashierStage {
 	private ObservableList<Product> products = FXCollections.observableArrayList();
 	private ObservableList<Product> billproducts = FXCollections.observableArrayList();
 	private TableView<Product> productData;
-	private TableView billData;
+	private TableView<Product> billData;
+	private float total = 0;
 	
-	public void view(Stage previousStage, Cashier cashier) {
+	public void view(Stage previousStage, Cashier cashier, UserIO uio) {
 		ProductIO pio = new ProductIO();
 		
 		Stage cashierStage = new Stage();
@@ -89,8 +94,12 @@ public class CashierStage {
 		BorderPane billView = new BorderPane();
 		billData = viewBillProducts();
 		billView.setCenter(billData);
-		
-		Label givenLabel = new Label("Given");
+
+		Label totalLabel = new Label("Total: " + total);
+		totalLabel.setFont(new Font(16));
+		totalLabel.setStyle("-fx-text-fill: White");
+
+		Label givenLabel = new Label("Given:   ");
 		givenLabel.setStyle("-fx-text-fill: White");
 		TextField givenTField = new TextField();
 		givenTField.getStyleClass().add("textfield");
@@ -99,7 +108,7 @@ public class CashierStage {
 		givenArea.setAlignment(Pos.CENTER);
 		givenArea.getChildren().addAll(givenLabel, givenTField);
 		
-		Label changeLabel = new Label("Change");
+		Label changeLabel = new Label("Change:");
 		changeLabel.setStyle("-fx-text-fill: White");
 		TextField changeTField = new TextField();
 		changeTField.getStyleClass().add("textfield");
@@ -120,8 +129,10 @@ public class CashierStage {
 		billLayout.setPrefHeight(150);
 		billLayout.setAlignment(Pos.CENTER);
 		billLayout.setStyle("-fx-background-color: #074F76");
-		billLayout.getChildren().addAll(givenArea, changeArea, buttonArea);
+		billLayout.getChildren().addAll(totalLabel, givenArea, changeArea, buttonArea);
 		billView.setBottom(billLayout);
+		
+		
 		
 		//Setting up button's images
 		ImageView cashRegisterIV = new ImageView();
@@ -130,16 +141,33 @@ public class CashierStage {
 		cashRegisterIV.setFitWidth(50);
 		cashRegisterIV.setPreserveRatio(true);
 		cashRegisterIV.setImage(cashRegisterImg);
+
+		ImageView logoutIV = new ImageView();
+		logoutIV.setFitHeight(50);
+		logoutIV.setFitWidth(50);
+		logoutIV.setPreserveRatio(true);
+		logoutIV.setImage(new Image("resources" + File.separator + "logout.png"));
 		
-		//Setting up buttons
+		//Setting up the main buttons
 		FlatButton cashRegisterButton = new FlatButton("Cash Register", cashRegisterIV);
 		cashRegisterButton.setPrefSize(120, 85);
+		FlatButton logOutButton = new FlatButton("Log Out", logoutIV);
+		logOutButton.setPrefSize(120, 85);
 		
 		//Adding functions to buttons
 		cashRegisterButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
 				mainWindow.setCenter(cashRegView);
+			}
+		});
+
+		logOutButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				cashierStage.close();
+				LoginStage lgs = new LoginStage();
+				lgs.view(cashierStage, uio);
 			}
 		});
 		
@@ -152,6 +180,9 @@ public class CashierStage {
 					boolean flag = false;
 					for(Product p : billproducts) {
 						if(p.getName().equals(pr.getName())) {
+							pr.updateQuantity(qty, pio);
+							refresh(pio);
+							productsView.setCenter(productData);
 							int nqty = p.getQuantity() + qty;
 							billproducts.remove(p);
 							Product newpr = new Product(pr.getName(), pr.getSupplier(), 
@@ -163,23 +194,67 @@ public class CashierStage {
 						}
 					}
 					if(!flag) {
+						pr.updateQuantity(qty, pio);
+						refresh(pio);
+						productsView.setCenter(productData);
 						Product newpr = new Product(pr.getName(), pr.getSupplier(),
 								qty, pr.getPriceForQuantity(qty), pr.getBarcode());
 						billproducts.add(newpr);
 						refresh();
 						billView.setCenter(billData);
 					}
-				}catch (Exception ex) {
+					total = 0;
+					for(Product p : billproducts){
+						total += p.getPrice();
+					}
+					totalLabel.setText("Total: " + total);
+				}catch (NullPointerException ex) {
 					Alert al = new Alert(AlertType.ERROR, "Cannot process request", ButtonType.OK);
+					al.setTitle("Error");
 					al.showAndWait();
+				} catch (NotEnoughQuantityException e) {
+					e.printStackTrace();
 				}
+			}
+		});
+
+		printButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				ArrayList<Product> prdcts = new ArrayList<Product>();
+				for(Product p : billproducts){
+					prdcts.add(p);
+				}
+				Bill newBill = new Bill(prdcts, total, cashier);
+				cashier.addBill(newBill);
+				uio.update();
+				newBill.toFile();
+				billproducts.clear();
+				refresh();
+			}
+		});
+		
+		clearButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent arg0) {
+				billproducts.clear();
+				refresh();
+			}
+		});
+		
+		deleteButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent arg0) {
+				Product pr = billData.getSelectionModel().getSelectedItem();
+				billproducts.remove(pr);
+				refresh();
 			}
 		});
 		
 		
 		//Finishing the Layout
 		cashRegView.getItems().addAll(productsView, billView);
-		topBar.getItems().addAll(cashRegisterButton);
+		topBar.getItems().addAll(cashRegisterButton, logOutButton);
 		
 		Scene cashierScene = new Scene(mainWindow, 1024, 576);
 		cashierScene.getStylesheets().add("style.css");
@@ -232,6 +307,7 @@ public class CashierStage {
 		billProducts.setItems(billproducts);
 		billProducts.getColumns().addAll(column1, column2, column3);
 		billProducts.setPrefSize(1024, 491);
+		billProducts.setPlaceholder(new Label("Add products to fill the bill"));
 		
 		return billProducts;
 		
@@ -244,7 +320,9 @@ public class CashierStage {
 	private void refresh(ProductIO pio) {
 		products.clear();
 		for(Product p : pio.getProducts()) {
-			products.add(p);
+			if(p.getQuantity() != 0) {
+				products.add(p);
+			}
 		}
 		productData = viewProducts(pio);
 	}

@@ -16,6 +16,7 @@ public class Cashier extends User implements IChecker, Serializable{
 		super(name, surname, username, password, birthday);
 		this.setUsertype("Cashier");
 		this.setSalary(salary);
+		bills = new ArrayList<Bill>();
 	}
 	
 	public void addBill(Bill b) {

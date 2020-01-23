@@ -16,7 +16,6 @@ public abstract class User implements Serializable{
 	private int salary;
 	
 	public User(String name, String surname, String username, String password, SimpleDate birthday) {
-		this.setId(getId() + (int)(Math.random()*10));
 		this.name = name;
 		this.surname = surname;
 		this.username = username;

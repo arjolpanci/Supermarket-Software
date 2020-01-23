@@ -6,12 +6,12 @@ import data.ProductIO;
 import data.UserIO;
 import employees.Admin;
 import employees.Cashier;
+import employees.Economist;
 import employees.User;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -20,7 +20,6 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
-import javafx.scene.control.Separator;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -38,34 +37,49 @@ public class SharedElements {
 		Stage editUserStage = new Stage();
 		editUserStage.getIcons().add(SharedElements.getIcon().getImage());
 		editUserStage.initModality(Modality.APPLICATION_MODAL);
-		
-		Separator sep = new Separator();
-		sep.setOrientation(Orientation.VERTICAL);
-		
-		Label currentValues = new Label("Current Values");
-		currentValues.setFont(new Font(20));
-		Label newValues = new Label("New Values");
-		newValues.setFont(new Font(20));
-		
-		Label currentName = new Label("First Name: \t" + user.getName());
-		Label currentSurname = new Label("Last Name: \t" + user.getSurname());
-		Label currentUsername = new Label("Username: \t" + user.getUsername());
-		Label currentPassword = new Label("Password: \t" + user.getPassword());
-		Label currentBirthday = new Label("Birthday: \t" + user.getBirthday().toString());
-
-		VBox labelArea = new VBox(30);
-		labelArea.getChildren().addAll(currentValues, currentName, currentSurname, currentUsername, currentPassword, currentBirthday);
-		
+		StackPane header = new StackPane();
+		header.setAlignment(Pos.CENTER);
+		header.setPrefHeight(70);
+		Label headerLabel = new Label("Edit User (" + user.getName() + ")");
+		headerLabel.setStyle("-fx-text-fill: White");
+		headerLabel.setFont(new Font(18));
+		header.getChildren().addAll(headerLabel);
+		header.setStyle("-fx-background-color: #074F76");
 		
 		TextField editNameTField = new TextField();
-		editNameTField.setPromptText("New Name");
+		editNameTField.setText(user.getName());
+		Label nameLabel = new Label("First Name: \t");
+		HBox nameArea = new HBox(10);
+		nameArea.setAlignment(Pos.CENTER);
+		nameArea.getChildren().addAll(nameLabel, editNameTField);
+		
 		TextField editSurnameTField = new TextField();
-		editSurnameTField.setPromptText("New Surname");
+		editSurnameTField.setText(user.getSurname());
+		Label surnameLabel = new Label("Last Name: \t");
+		HBox surnameArea = new HBox(10);
+		surnameArea.setAlignment(Pos.CENTER);
+		surnameArea.getChildren().addAll(surnameLabel, editSurnameTField);
+		
 		TextField editUsernameTField = new TextField();
-		editUsernameTField.setPromptText("New Username");
+		editUsernameTField.setText(user.getUsername());
+		Label usernameLabel = new Label("Username: \t");
+		HBox usernameArea = new HBox(10);
+		usernameArea.setAlignment(Pos.CENTER);
+		usernameArea.getChildren().addAll(usernameLabel, editUsernameTField);
+		
 		TextField editPasswordTField = new TextField();
-		editPasswordTField.setPromptText("New Password");
+		editPasswordTField.setText(user.getPassword());
+		Label passwordLabel = new Label("Password: \t");
+		HBox passwordArea = new HBox(10);
+		passwordArea.setAlignment(Pos.CENTER);
+		passwordArea.getChildren().addAll(passwordLabel, editPasswordTField);
+		
 		DatePicker editBirthdayField = new DatePicker();
+		editBirthdayField.setValue(user.getBirthday().toLocalDate());
+		Label birthdayLabel = new Label("Birthday: \t");
+		HBox birthdayArea = new HBox(10);
+		birthdayArea.setAlignment(Pos.CENTER);
+		birthdayArea.getChildren().addAll(birthdayLabel, editBirthdayField);
 		
 		FlatButton saveButton = new FlatButton("Save");
 		saveButton.setPrefSize(80, 50);
@@ -73,7 +87,7 @@ public class SharedElements {
 		cancelButton.setPrefSize(80, 50);
 		
 		HBox buttonArea = new HBox(80);
-		buttonArea.setPrefHeight(70);
+		buttonArea.setPrefHeight(60);
 		buttonArea.setAlignment(Pos.CENTER);
 		buttonArea.setStyle("-fx-background-color: #074F76");
 		buttonArea.getChildren().addAll(saveButton, cancelButton);
@@ -127,20 +141,10 @@ public class SharedElements {
 			}
 		});
 		
-		VBox tfieldArea = new VBox(20);
-		tfieldArea.setAlignment(Pos.CENTER);
-		tfieldArea.getChildren().addAll(newValues, editNameTField, editSurnameTField, editUsernameTField, editPasswordTField, editBirthdayField);
-		
-		
-		HBox fullLayout = new HBox(40);
-		fullLayout.setAlignment(Pos.CENTER);
-		fullLayout.getChildren().addAll(labelArea, sep, tfieldArea);
-		
-		VBox layout = new VBox(45);
+		VBox layout = new VBox(20);
 		layout.setAlignment(Pos.CENTER);
-		layout.getChildren().addAll(fullLayout, buttonArea);
+		layout.getChildren().addAll(header, nameArea, surnameArea, usernameArea, passwordArea, birthdayArea, buttonArea);
 
-		
 		Scene editUserScene = new Scene(layout, 450, 360);
 		editUserStage.setTitle("Edit User");
 		editUserStage.setResizable(false);
@@ -280,6 +284,16 @@ public class SharedElements {
 							uio.addUser(csh);
 							flag = true;
 							break;
+						case "Economist":
+							Economist ec = new Economist(nameTField.getText(), surnameTField.getText(), usernameTField.getText(),
+									passwordTField.getText(), new SimpleDate(birthdayField.getValue()), Integer.parseInt(salaryField.getText()));
+							uio.addUser(ec);
+							flag = true;
+							break;
+						default:
+			               	Alert al = new Alert(AlertType.ERROR, "Cannot process request", ButtonType.OK);
+		                	al.show();
+		                	break;
 						}
 					}	
 				}catch (Exception ex) {
@@ -320,6 +334,7 @@ public class SharedElements {
 		fullLayout.getChildren().addAll(dataArea, buttonArea);
 		finalLayout.getChildren().addAll(header, fullLayout);
 		Scene addUserScene = new Scene(finalLayout, 400,460);
+		
 		addUserScene.getStylesheets().add("style.css");
 
 		addUserStage.setScene(addUserScene);
@@ -358,12 +373,22 @@ public class SharedElements {
 		buttonArea.getChildren().addAll(addButton, cancelButton);
 
 		//Setting up the data fields
+		ChoiceBox<String> existingCBox = new ChoiceBox<String>();
+		existingCBox.getItems().add("New Product");
+		for(Product p : pio.getProducts()) {
+			existingCBox.getItems().add(p.getName());
+		}
+		existingCBox.setValue(existingCBox.getItems().get(0));
+		Label existingLabel = new Label("Existing Products: ");
+		HBox existingArea = new HBox(20);
+		existingArea.setAlignment(Pos.CENTER);
+		existingArea.getChildren().addAll(existingLabel, existingCBox);
 		
 		TextField nameTField = new TextField();
 		nameTField.getStyleClass().add("textfield");
 		nameTField.setPrefWidth(200);
 		nameTField.setPromptText("Enter Name ...");
-		Label nameLabel = new Label("First Name: ");
+		Label nameLabel = new Label("Name: ");
 		HBox nameArea = new HBox(20);
 		nameArea.setAlignment(Pos.CENTER);
 		nameArea.getChildren().addAll(nameLabel, nameTField);
@@ -404,7 +429,7 @@ public class SharedElements {
 		barcodeArea.setAlignment(Pos.CENTER);
 		barcodeArea.getChildren().addAll(barcodeLabel, barcodeTField);
 		
-		dataArea.getChildren().addAll(nameArea, supplierArea, quantityArea, priceArea, barcodeArea, buttonArea);
+		dataArea.getChildren().addAll(existingArea, nameArea, supplierArea, quantityArea, priceArea, barcodeArea, buttonArea);
 		fullLayout.getChildren().addAll(dataArea, buttonArea);
 		finalLayout.getChildren().addAll(header, fullLayout);
 		Scene addProductScene = new Scene(finalLayout, 400,460);
@@ -418,7 +443,7 @@ public class SharedElements {
 				String name = nameTField.getText();
 				String supplier = supplierTField.getText();
 				int quantity = Integer.parseInt(quantityTField.getText());
-				int price = Integer.parseInt(priceTField.getText());
+				float price = Float.parseFloat(priceTField.getText());
 				int barcode = Integer.parseInt(barcodeTField.getText());
 				pio.addProduct(new Product(name, supplier, quantity, price, barcode));
 				Alert al = new Alert(AlertType.INFORMATION, "Action performed succesfully", ButtonType.OK);
@@ -432,6 +457,35 @@ public class SharedElements {
 				addProductStage.close();
 			}
 		});
+		
+		//Handling other events
+		existingCBox.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue<? extends String> arg0, String arg1, String arg2) {
+				if(arg2.equals("New Product")) {
+					nameTField.setDisable(false);
+					nameTField.setText("");
+					supplierTField.setDisable(false);
+					supplierTField.setText("");
+					quantityTField.setDisable(false);
+					quantityTField.setText("");
+					priceTField.setDisable(false);
+					priceTField.setText("");
+					barcodeTField.setDisable(false);
+					barcodeTField.setText("");
+				}else {
+					Product p = pio.getProductFromName(arg2);
+					nameTField.setDisable(true);
+					nameTField.setText(p.getName());
+					supplierTField.setDisable(true);
+					supplierTField.setText(p.getName());
+					quantityTField.setText("" + p.getQuantity());
+					priceTField.setText("" + p.getPrice());
+					barcodeTField.setDisable(true);
+					barcodeTField.setText("" + p.getBarcode());
+				}
+			}
+		});
 
 		addProductStage.setScene(addProductScene);
 		addProductStage.getIcons().add(SharedElements.getIcon().getImage());
@@ -439,6 +493,77 @@ public class SharedElements {
 		addProductStage.setTitle("Add Product");
 		addProductStage.setResizable(false);
 		addProductStage.showAndWait();
+	}
+	
+	public static void editProductView(Stage previousStage, ProductIO pio, Product p) {
+		Stage editProductStage = new Stage();
+		Label quantityLabel = new Label("Change Quantity: ");
+		TextField qtyTField = new TextField();
+		qtyTField.setText("" + p.getQuantity());
+		qtyTField.getStyleClass().add("textfield");
+		HBox quantityArea = new HBox(15);
+		quantityArea.setAlignment(Pos.CENTER);
+		quantityArea.getChildren().addAll(quantityLabel, qtyTField);
+		
+		Label priceLabel = new Label("Change Price: ");
+		TextField priceTField = new TextField();
+		priceTField.setText("" + p.getPrice());
+		priceTField.getStyleClass().add("textfield");
+		HBox priceArea = new HBox(15);
+		priceArea.setAlignment(Pos.CENTER);
+		priceArea.getChildren().addAll(priceLabel, priceTField);
+		
+		FlatButton editButton = new FlatButton("Edit");
+		FlatButton cancelButton = new FlatButton("Cancel");
+		HBox buttonArea = new HBox(30);
+		buttonArea.setAlignment(Pos.CENTER);
+		buttonArea.setPrefHeight(100);
+		buttonArea.setStyle("-fx-background-color: #074F76");
+		buttonArea.getChildren().addAll(editButton, cancelButton);
+		
+		//Adding Functions to buttons
+		editButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent arg0) {
+				if(qtyTField.getText().equals("") || priceTField.getText().equals("")) {
+					Alert al = new Alert(AlertType.ERROR, "Please fill in all the data", ButtonType.OK);
+					al.setTitle("Error");
+					al.showAndWait();
+				}else {
+					try {
+						int newqty = Integer.parseInt(qtyTField.getText());
+						float newprice = Float.parseFloat(priceTField.getText());
+						pio.removeProduct(p);
+						p.setQuantity(newqty);
+						p.setPrice(newprice);
+						pio.addProduct(p);
+						pio.update();
+						Alert al = new Alert(AlertType.INFORMATION, "Action performed succesfully", ButtonType.OK);
+						al.setTitle("Information");
+						al.showAndWait();
+					} catch(Exception ex) {
+						Alert al = new Alert(AlertType.ERROR, "Cannot Process Request", ButtonType.OK);
+						al.setTitle("Error");
+						al.showAndWait();
+					}
+				}
+			}
+		});
+		
+		cancelButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent arg0) {
+				editProductStage.close();
+			}
+		});
+		
+		VBox layout = new VBox(20);
+		layout.setAlignment(Pos.CENTER);
+		layout.getChildren().addAll(quantityArea, priceArea, buttonArea);
+		Scene editProductScene = new Scene(layout, 400, 150);
+		editProductStage.setTitle("Edit Product");
+		editProductStage.setScene(editProductScene);
+		editProductStage.showAndWait();
 	}
 	
 	public static ImageView getIcon() {
