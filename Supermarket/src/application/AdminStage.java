@@ -1,6 +1,7 @@
 package application;
 
 import java.io.File;
+import java.util.ArrayList;
 
 import data.ProductIO;
 import data.UserIO;
@@ -31,6 +32,8 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import products.Product;
 import util.FlatButton;
+import util.Notification;
+import util.NotificationManager;
 import util.SharedElements;
 
 public class AdminStage {
@@ -40,9 +43,10 @@ public class AdminStage {
 	private TableView userData;
 	private TableView productData;
 	
-	public void view(Stage previousStage) {
+	public void view(Stage previousStage, Admin adm) {
 		UserIO uio = new UserIO();
 		ProductIO pio = new ProductIO();
+		NotificationManager nm = new NotificationManager();
 		
 		//Setting up the layout
 		Stage adminStage = new Stage();
@@ -75,11 +79,15 @@ public class AdminStage {
 		incomeImg.setFitWidth(50);
 		incomeImg.setPreserveRatio(true);
 		
-		ImageView logoutIV = new ImageView();
+		ImageView notifIV = new ImageView(new Image("resources" + File.separator + "alert.png"));
+		notifIV.setFitHeight(50);
+		notifIV.setFitWidth(50);
+		notifIV.setPreserveRatio(true);
+		
+		ImageView logoutIV = new ImageView(new Image("resources" + File.separator + "logout.png"));
 		logoutIV.setFitHeight(50);
 		logoutIV.setFitWidth(50);
 		logoutIV.setPreserveRatio(true);
-		logoutIV.setImage(new Image("resources" + File.separator + "logout.png"));
 		
 		
 		//Setting up the buttons for User View
@@ -89,6 +97,8 @@ public class AdminStage {
 		productsButton.setPrefSize(100, 85);
 		FlatButton incomeButton = new FlatButton("Income", incomeImg);
 		incomeButton.setPrefSize(100, 85);
+		FlatButton notificationButton = new FlatButton("Notification", notifIV);
+		notificationButton.setPrefSize(100, 85);
 		FlatButton logOutButton = new FlatButton("Log Out", logoutIV);
 		logOutButton.setPrefSize(120, 85);
 		
@@ -127,6 +137,13 @@ public class AdminStage {
 				mainWindow.setBottom(productsTBar);
 				refresh(pio);
 				mainPane.setContent(productData);
+			}
+		});
+		
+		notificationButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent arg0) {
+				SharedElements.notificationView(adm, nm);
 			}
 		});
 		
@@ -237,18 +254,28 @@ public class AdminStage {
 		logOut.setGraphic(logOutLabel);
 		menu.getMenus().add(logOut);
 		
-		topBar.getItems().addAll(usersButton, productsButton, incomeButton, logOutButton);
+		topBar.getItems().addAll(usersButton, productsButton, incomeButton, notificationButton, logOutButton);
 		VBox top = new VBox(menu, topBar);
 		usersButtonTbar.getChildren().addAll(addUserButton, editUserButton, removeUserButton, statsUserButton);
 		mainWindow.setTop(top);
 		Scene adminScene = new Scene(mainWindow, 1024, 576);
 		adminScene.getStylesheets().add("style.css");
 		adminStage.setTitle("Admin Window");
-		//adminStage.setResizable(false);
 		adminStage.setScene(adminScene);
 		mainWindow.requestFocus();
 		adminStage.show();
 		
+		ArrayList<Notification> toRemove = new ArrayList<Notification>();
+		for(Notification n : nm.getNotifications()) {
+			if(n.getReciever().equals("Administrator")) {
+				n.show(nm, toRemove);
+			}
+		}
+		for(Notification n : toRemove) {
+			nm.removeNotification(n);
+			nm.update();
+		}
+		//nm.update();
 	}
 	
 	private TableView viewUsers(UserIO uio) {

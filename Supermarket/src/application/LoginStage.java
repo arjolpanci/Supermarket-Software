@@ -117,7 +117,7 @@ public class LoginStage {
 				User user = uio.checkUser(userTField.getText(), pwTField.getText());
 				if(user instanceof Admin) {
 					AdminStage adminStage = new AdminStage();
-					adminStage.view(loginStage);
+					adminStage.view(loginStage, (Admin) user);
 					loginStage.close();
 				}else if(user instanceof Cashier){
 					CashierStage cashierStage = new CashierStage();
@@ -125,7 +125,7 @@ public class LoginStage {
 					loginStage.close();
 				}else if(user instanceof Economist){
 					EconomistStage economistStage = new EconomistStage();
-					economistStage.view(loginStage);
+					economistStage.view(loginStage, (Economist) user);
 					loginStage.close();
 				}else {
 					Alert al = new Alert(AlertType.ERROR, "No user exists with the given data", ButtonType.OK);

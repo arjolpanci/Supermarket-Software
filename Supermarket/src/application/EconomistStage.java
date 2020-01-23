@@ -1,10 +1,12 @@
 package application;
 
 import java.io.File;
+import java.util.ArrayList;
 
 import data.ProductIO;
 import data.UserIO;
 import employees.Admin;
+import employees.Economist;
 import employees.User;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -28,6 +30,8 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import products.Product;
 import util.FlatButton;
+import util.Notification;
+import util.NotificationManager;
 import util.SharedElements;
 
 public class EconomistStage {
@@ -37,9 +41,10 @@ public class EconomistStage {
 	private TableView userData;
 	private TableView productData;
 	
-	public void view(Stage previousStage) {
+	public void view(Stage previousStage, Economist ecm) {
 		UserIO uio = new UserIO();
 		ProductIO pio = new ProductIO();
+		NotificationManager nm = new NotificationManager();
 		
 		//Setting up the layout
 		Stage economistStage = new Stage();
@@ -72,11 +77,15 @@ public class EconomistStage {
 		incomeImg.setFitWidth(50);
 		incomeImg.setPreserveRatio(true);
 			
-		ImageView logoutIV = new ImageView();
+		ImageView notifIV = new ImageView(new Image("resources" + File.separator + "alert.png"));
+		notifIV.setFitHeight(50);
+		notifIV.setFitWidth(50);
+		notifIV.setPreserveRatio(true);
+		
+		ImageView logoutIV = new ImageView(new Image("resources" + File.separator + "logout.png"));
 		logoutIV.setFitHeight(50);
 		logoutIV.setFitWidth(50);
 		logoutIV.setPreserveRatio(true);
-		logoutIV.setImage(new Image("resources" + File.separator + "logout.png"));
 			
 			
 		//Setting up the buttons for User View
@@ -86,6 +95,8 @@ public class EconomistStage {
 		productsButton.setPrefSize(100, 85);
 		FlatButton incomeButton = new FlatButton("Income", incomeImg);
 		incomeButton.setPrefSize(100, 85);
+		FlatButton notificationButton = new FlatButton("Notification", notifIV);
+		notificationButton.setPrefSize(100, 85);
 		FlatButton logOutButton = new FlatButton("Log Out", logoutIV);
 		logOutButton.setPrefSize(120, 85);
 		
@@ -121,7 +132,14 @@ public class EconomistStage {
 				mainPane.setContent(productData);
 			}
 		});
-			
+
+		notificationButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent arg0) {
+				SharedElements.notificationView(ecm, nm);
+			}
+		});
+		
 		logOutButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent arg0) {
@@ -176,7 +194,19 @@ public class EconomistStage {
 		economistStage.setTitle("Economist Window");
 		economistStage.setScene(economistScene);
 		mainWindow.requestFocus();
-		economistStage.show();			
+		economistStage.show();		
+		
+		ArrayList<Notification> toRemove = new ArrayList<Notification>();
+		for(Notification n : nm.getNotifications()) {
+			if(n.getReciever().equals("Economist")) {
+				n.show(nm, toRemove);
+			}
+		}
+		for(Notification n : toRemove) {
+			nm.removeNotification(n);
+			nm.update();
+		}
+		
 	}
 	
 	private TableView viewUsers(UserIO uio) {

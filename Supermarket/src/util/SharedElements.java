@@ -20,6 +20,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -564,6 +565,58 @@ public class SharedElements {
 		editProductStage.setTitle("Edit Product");
 		editProductStage.setScene(editProductScene);
 		editProductStage.showAndWait();
+	}
+	
+	public static void notificationView(User sender, NotificationManager nm) {
+		Stage createNotificationStage = new Stage();
+		createNotificationStage.initModality(Modality.APPLICATION_MODAL);
+		createNotificationStage.setTitle("Send Notification");
+		
+		Label sendToLabel = new Label("Send To: ");
+		ChoiceBox<String> reciever = new ChoiceBox<String>();
+		reciever.getItems().addAll("Administrator", "Economist", "Cashier");
+		HBox sendArea = new HBox(20);
+		sendArea.setAlignment(Pos.CENTER);
+		sendArea.getChildren().addAll(sendToLabel, reciever);
+		
+		Label messageLabel = new Label("Message: ");
+		TextArea msgArea = new TextArea();
+		msgArea.setPromptText("Enter message here");
+		HBox messageArea = new HBox(20);
+		messageArea.setAlignment(Pos.CENTER);
+		messageArea.getChildren().addAll(messageLabel, msgArea);
+		
+		FlatButton sendNotification = new FlatButton("Send");
+		
+		sendNotification.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent arg0) {
+				try {
+					String choice = reciever.getSelectionModel().getSelectedItem();
+					if(msgArea.getText().equals("")) {
+						Alert al = new Alert(AlertType.ERROR, "Please fill in the message", ButtonType.OK);
+						al.showAndWait();
+					}
+					Notification n = new Notification(sender.getUsertype(), choice, msgArea.getText());
+					nm.addNotification(n);
+					nm.update();
+					Alert al = new Alert(AlertType.INFORMATION, "Action performed succesfully", ButtonType.OK);
+					al.showAndWait();
+				} catch (Exception ex) {
+					Alert al = new Alert(AlertType.ERROR, "Cannot process request", ButtonType.OK);
+					al.showAndWait();
+				}
+				
+			}
+		});
+		
+		VBox layout = new VBox(15);
+		layout.setAlignment(Pos.CENTER);
+		layout.getChildren().addAll(sendArea, messageArea, sendNotification);
+		
+		Scene notifCreatorScene = new Scene(layout, 250, 250);
+		createNotificationStage.setScene(notifCreatorScene);
+		createNotificationStage.showAndWait();
 	}
 	
 	public static ImageView getIcon() {
