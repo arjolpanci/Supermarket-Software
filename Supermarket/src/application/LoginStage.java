@@ -17,6 +17,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.PasswordField;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -26,6 +27,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import products.Product;
 import util.FlatButton;
 import util.Notification;
@@ -37,16 +39,18 @@ public class LoginStage {
 	
 	public void view(Stage previousStage, UserIO uio) {
 		Stage loginStage = new Stage();
-		
 		ProductIO pio = new ProductIO();
 		NotificationManager nm = new NotificationManager();
 		
 		for(Product p : pio.getProducts()) {
 			if(p.hasExpired()) {
-				nm.addNotification(new Notification("Application", "Administrator", p.getName() + " has expired"));
-				nm.addNotification(new Notification("Application", "Economist", p.getName() + " has expired"));
+				Notification na = new Notification("Application", "Administrator", p.getName() + " has expired");
+				Notification ne = new Notification("Application", "Economist", p.getName() + " has expired");
+				if(!nm.exits(na)) nm.addNotification(na);
+				if(!nm.exits(ne))nm.addNotification(ne);
 			}
 		}
+		
 		
 		BorderPane loginLayout = new BorderPane();
 		StackPane leftArea = new StackPane();

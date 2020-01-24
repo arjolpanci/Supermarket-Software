@@ -38,8 +38,8 @@ public class Product implements Serializable{
 	}
 	
 	public boolean hasExpired() {
-		if(expireDate.isAfter(LocalDate.now())) return true;
-		if(expireDate.isEqual(LocalDate.now())) return true;
+		if(this.getExpireDate().isBefore(LocalDate.now())) return true;
+		if(this.getExpireDate().isEqual(LocalDate.now())) return true;
 		return false;
 	}
 

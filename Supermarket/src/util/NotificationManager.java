@@ -29,6 +29,14 @@ public class NotificationManager {
 		write();
 	}
 	
+	public boolean exits(Notification n) {
+		for(Notification not : notifications) {
+			if(not.getSender().equals(n.getSender()) && not.getReciever().equals(n.getReciever()) 
+					&& not.getMessage().equals(n.getMessage())) return true;
+		}
+		return false;
+	}
+	
 	public ArrayList<Notification> getNotifications(){
 		return notifications;
 	}

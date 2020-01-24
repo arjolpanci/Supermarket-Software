@@ -448,6 +448,7 @@ public class SharedElements {
 					quantityTField.clear();
 					priceTField.clear();
 					barcodeTField.clear();
+					dateField.setValue(null);
 				} catch (Exception ex) {
 					Alert al = new Alert(AlertType.ERROR, "Cannot Process Request", ButtonType.OK);
 					al.setTitle("Error");
