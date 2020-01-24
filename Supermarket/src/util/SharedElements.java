@@ -1,7 +1,11 @@
 package util;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.time.LocalDate;
+import java.util.Scanner;
 
+import data.Bill;
 import data.ProductIO;
 import data.UserIO;
 import employees.Admin;
@@ -20,10 +24,16 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToolBar;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -36,16 +46,9 @@ public class SharedElements {
 	
 	public static void editUserView(Stage previousStage, User user, UserIO uio) {
 		Stage editUserStage = new Stage();
+		editUserStage.setResizable(false);
 		editUserStage.getIcons().add(SharedElements.getIcon().getImage());
 		editUserStage.initModality(Modality.APPLICATION_MODAL);
-		StackPane header = new StackPane();
-		header.setAlignment(Pos.CENTER);
-		header.setPrefHeight(70);
-		Label headerLabel = new Label("Edit User (" + user.getName() + ")");
-		headerLabel.setStyle("-fx-text-fill: White");
-		headerLabel.setFont(new Font(18));
-		header.getChildren().addAll(headerLabel);
-		header.setStyle("-fx-background-color: #074F76");
 		
 		TextField editNameTField = new TextField();
 		editNameTField.setText(user.getName());
@@ -83,14 +86,13 @@ public class SharedElements {
 		birthdayArea.getChildren().addAll(birthdayLabel, editBirthdayField);
 		
 		FlatButton saveButton = new FlatButton("Save");
-		saveButton.setPrefSize(80, 50);
+		saveButton.setPrefSize(70, 30);
 		FlatButton cancelButton = new FlatButton("Cancel");
-		cancelButton.setPrefSize(80, 50);
+		cancelButton.setPrefSize(70, 30);
 		
 		HBox buttonArea = new HBox(80);
 		buttonArea.setPrefHeight(60);
 		buttonArea.setAlignment(Pos.CENTER);
-		buttonArea.setStyle("-fx-background-color: #074F76");
 		buttonArea.getChildren().addAll(saveButton, cancelButton);
 		
 		
@@ -144,7 +146,7 @@ public class SharedElements {
 		
 		VBox layout = new VBox(20);
 		layout.setAlignment(Pos.CENTER);
-		layout.getChildren().addAll(header, nameArea, surnameArea, usernameArea, passwordArea, birthdayArea, buttonArea);
+		layout.getChildren().addAll(SharedElements.getHeader("Edit User: " + user.getName(), 0, 70), nameArea, surnameArea, usernameArea, passwordArea, birthdayArea, buttonArea);
 
 		Scene editUserScene = new Scene(layout, 450, 360);
 		editUserStage.setTitle("Edit User");
@@ -159,17 +161,7 @@ public class SharedElements {
 
 		//Layout stuff
 		VBox finalLayout = new VBox(40);
-		
-		StackPane header = new StackPane();
-		header.setPrefHeight(60);
-		header.setAlignment(Pos.CENTER);
-		header.setStyle("-fx-background-color: #074F76");
-		Label headerLabel = new Label("Add User");
-		if(uio.isFirstTime()) headerLabel.setText("Add Administrator");
-		headerLabel.setStyle("-fx-text-fill: White");
-		headerLabel.setFont(new Font(20));
-		header.getChildren().add(headerLabel);
-		
+
 		VBox fullLayout = new VBox(30);
 		fullLayout.setAlignment(Pos.CENTER);
 		HBox buttonArea = new HBox(20);
@@ -333,7 +325,7 @@ public class SharedElements {
 		//Constructing the scene
 		dataArea.getChildren().addAll(choiceArea, nameArea, surnameArea, usernameArea, passwordArea, birthdayArea, salaryArea, buttonArea);
 		fullLayout.getChildren().addAll(dataArea, buttonArea);
-		finalLayout.getChildren().addAll(header, fullLayout);
+		finalLayout.getChildren().addAll(SharedElements.getHeader("Add User", 0, 60), fullLayout);
 		Scene addUserScene = new Scene(finalLayout, 400,460);
 		
 		addUserScene.getStylesheets().add("style.css");
@@ -351,16 +343,7 @@ public class SharedElements {
 
 		//Layout stuff
 		VBox finalLayout = new VBox(40);
-		
-		StackPane header = new StackPane();
-		header.setPrefHeight(60);
-		header.setAlignment(Pos.CENTER);
-		header.setStyle("-fx-background-color: #074F76");
-		Label headerLabel = new Label("Add Product");
-		headerLabel.setStyle("-fx-text-fill: White");
-		headerLabel.setFont(new Font(20));
-		header.getChildren().add(headerLabel);
-		
+
 		VBox fullLayout = new VBox(30);
 		fullLayout.setAlignment(Pos.CENTER);
 		HBox buttonArea = new HBox(20);
@@ -430,9 +413,15 @@ public class SharedElements {
 		barcodeArea.setAlignment(Pos.CENTER);
 		barcodeArea.getChildren().addAll(barcodeLabel, barcodeTField);
 		
-		dataArea.getChildren().addAll(existingArea, nameArea, supplierArea, quantityArea, priceArea, barcodeArea, buttonArea);
+		DatePicker dateField = new DatePicker();
+		Label expireLabel = new Label("Expire Date: ");
+		HBox expireArea = new HBox(20);
+		expireArea.setAlignment(Pos.CENTER);
+		expireArea.getChildren().addAll(expireLabel, dateField);
+		
+		dataArea.getChildren().addAll(existingArea, nameArea, supplierArea, quantityArea, priceArea, barcodeArea, buttonArea, expireArea);
 		fullLayout.getChildren().addAll(dataArea, buttonArea);
-		finalLayout.getChildren().addAll(header, fullLayout);
+		finalLayout.getChildren().addAll(SharedElements.getHeader("Add Product", 0, 60), fullLayout);
 		Scene addProductScene = new Scene(finalLayout, 400,460);
 		addProductScene.getStylesheets().add("style.css");
 		
@@ -441,14 +430,26 @@ public class SharedElements {
 		addButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				String name = nameTField.getText();
-				String supplier = supplierTField.getText();
-				int quantity = Integer.parseInt(quantityTField.getText());
-				float price = Float.parseFloat(priceTField.getText());
-				int barcode = Integer.parseInt(barcodeTField.getText());
-				pio.addProduct(new Product(name, supplier, quantity, price, barcode));
-				Alert al = new Alert(AlertType.INFORMATION, "Action performed succesfully", ButtonType.OK);
-				al.showAndWait();
+				try {
+					String name = nameTField.getText();
+					String supplier = supplierTField.getText();
+					int quantity = Integer.parseInt(quantityTField.getText());
+					float price = Float.parseFloat(priceTField.getText());
+					int barcode = Integer.parseInt(barcodeTField.getText());
+					pio.addProduct(new Product(name, supplier, quantity, price, barcode, new SimpleDate(dateField.getValue())));
+					Alert al = new Alert(AlertType.INFORMATION, "Action performed succesfully", ButtonType.OK);
+					al.showAndWait();
+					nameTField.clear();
+					supplierTField.clear();
+					quantityTField.clear();
+					priceTField.clear();
+					barcodeTField.clear();
+				} catch (Exception ex) {
+					Alert al = new Alert(AlertType.ERROR, "Cannot Process Request", ButtonType.OK);
+					al.setTitle("Error");
+					al.showAndWait();
+				}
+
 			}
 		});
 		
@@ -465,15 +466,17 @@ public class SharedElements {
 			public void changed(ObservableValue<? extends String> arg0, String arg1, String arg2) {
 				if(arg2.equals("New Product")) {
 					nameTField.setDisable(false);
-					nameTField.setText("");
+					nameTField.clear();
 					supplierTField.setDisable(false);
-					supplierTField.setText("");
+					supplierTField.clear();
 					quantityTField.setDisable(false);
-					quantityTField.setText("");
+					quantityTField.clear();
 					priceTField.setDisable(false);
-					priceTField.setText("");
+					priceTField.clear();
 					barcodeTField.setDisable(false);
-					barcodeTField.setText("");
+					barcodeTField.clear();
+					dateField.setDisable(false);
+					dateField.setValue(null);
 				}else {
 					Product p = pio.getProductFromName(arg2);
 					nameTField.setDisable(true);
@@ -484,6 +487,8 @@ public class SharedElements {
 					priceTField.setText("" + p.getPrice());
 					barcodeTField.setDisable(true);
 					barcodeTField.setText("" + p.getBarcode());
+					dateField.setDisable(true);
+					dateField.setValue(p.getExpireDate());
 				}
 			}
 		});
@@ -498,6 +503,9 @@ public class SharedElements {
 	
 	public static void editProductView(Stage previousStage, ProductIO pio, Product p) {
 		Stage editProductStage = new Stage();
+		editProductStage.initModality(Modality.APPLICATION_MODAL);
+		editProductStage.getIcons().add(SharedElements.getIcon().getImage());
+		editProductStage.setResizable(false);
 		Label quantityLabel = new Label("Change Quantity: ");
 		TextField qtyTField = new TextField();
 		qtyTField.setText("" + p.getQuantity());
@@ -519,7 +527,6 @@ public class SharedElements {
 		HBox buttonArea = new HBox(30);
 		buttonArea.setAlignment(Pos.CENTER);
 		buttonArea.setPrefHeight(100);
-		buttonArea.setStyle("-fx-background-color: #074F76");
 		buttonArea.getChildren().addAll(editButton, cancelButton);
 		
 		//Adding Functions to buttons
@@ -560,8 +567,8 @@ public class SharedElements {
 		
 		VBox layout = new VBox(20);
 		layout.setAlignment(Pos.CENTER);
-		layout.getChildren().addAll(quantityArea, priceArea, buttonArea);
-		Scene editProductScene = new Scene(layout, 400, 150);
+		layout.getChildren().addAll(SharedElements.getHeader("Edit Product: " + p.getName(), 0, 60), quantityArea, priceArea, buttonArea);
+		Scene editProductScene = new Scene(layout, 400, 240);
 		editProductStage.setTitle("Edit Product");
 		editProductStage.setScene(editProductScene);
 		editProductStage.showAndWait();
@@ -569,6 +576,8 @@ public class SharedElements {
 	
 	public static void notificationView(User sender, NotificationManager nm) {
 		Stage createNotificationStage = new Stage();
+		createNotificationStage.setResizable(false);
+		createNotificationStage.getIcons().add(SharedElements.getIcon().getImage());
 		createNotificationStage.initModality(Modality.APPLICATION_MODAL);
 		createNotificationStage.setTitle("Send Notification");
 		
@@ -579,14 +588,18 @@ public class SharedElements {
 		sendArea.setAlignment(Pos.CENTER);
 		sendArea.getChildren().addAll(sendToLabel, reciever);
 		
-		Label messageLabel = new Label("Message: ");
 		TextArea msgArea = new TextArea();
+		msgArea.setPrefWidth(300);
 		msgArea.setPromptText("Enter message here");
 		HBox messageArea = new HBox(20);
 		messageArea.setAlignment(Pos.CENTER);
-		messageArea.getChildren().addAll(messageLabel, msgArea);
+		messageArea.getChildren().addAll(msgArea);
 		
+		HBox button = new HBox();
+		button.setAlignment(Pos.CENTER);
 		FlatButton sendNotification = new FlatButton("Send");
+		button.getChildren().add(sendNotification);
+		button.setPrefHeight(50);
 		
 		sendNotification.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
@@ -596,6 +609,7 @@ public class SharedElements {
 					if(msgArea.getText().equals("")) {
 						Alert al = new Alert(AlertType.ERROR, "Please fill in the message", ButtonType.OK);
 						al.showAndWait();
+						return;
 					}
 					Notification n = new Notification(sender.getUsertype(), choice, msgArea.getText());
 					nm.addNotification(n);
@@ -606,17 +620,160 @@ public class SharedElements {
 					Alert al = new Alert(AlertType.ERROR, "Cannot process request", ButtonType.OK);
 					al.showAndWait();
 				}
-				
+				msgArea.clear();
 			}
 		});
 		
-		VBox layout = new VBox(15);
+		VBox layout = new VBox(10);
 		layout.setAlignment(Pos.CENTER);
-		layout.getChildren().addAll(sendArea, messageArea, sendNotification);
+		layout.getChildren().addAll(SharedElements.getHeader("Send Notifications", 0, 60), sendArea, messageArea, button);
 		
-		Scene notifCreatorScene = new Scene(layout, 250, 250);
+		Scene notifCreatorScene = new Scene(layout, 400, 330);
 		createNotificationStage.setScene(notifCreatorScene);
 		createNotificationStage.showAndWait();
+	}
+	
+	public static void viewStatistics(Cashier c) {
+		Stage statsStage = new Stage();
+		statsStage.initModality(Modality.APPLICATION_MODAL);
+		statsStage.setTitle("Statistics");
+		statsStage.getIcons().add(SharedElements.getIcon().getImage());
+		
+		TableView<Bill> bills = new TableView<Bill>();
+		TableColumn<Bill, Integer> column1 = new TableColumn<>("Id");
+		column1.setCellValueFactory(new PropertyValueFactory<>("id"));
+		TableColumn<Bill, String> column2 = new TableColumn<>("Date Created");
+		column2.setCellValueFactory(new PropertyValueFactory<>("dateCreated"));
+		TableColumn<Bill, Integer> column3 = new TableColumn<>("Total");
+		column3.setCellValueFactory(new PropertyValueFactory<>("total"));
+		bills.getColumns().addAll(column1, column2, column3);
+		bills.setPrefWidth(400);
+		
+		for(Bill b : c.getBills()) {
+			bills.getItems().add(b);
+		}
+		
+		ScrollPane table = new ScrollPane();
+		table.setContent(bills);
+		table.setFitToWidth(true);
+		
+		DatePicker startDate = new DatePicker();
+		Label fromLabel = new Label("From: ");
+		fromLabel.setStyle("-fx-text-fill: White");
+		HBox startArea = new HBox(10);
+		startArea.setAlignment(Pos.CENTER);
+		startArea.getChildren().addAll(fromLabel, startDate);
+		
+		DatePicker endDate = new DatePicker();
+		Label toLabel = new Label("To: ");
+		toLabel.setStyle("-fx-text-fill: White");
+		HBox endArea = new HBox(10);
+		endArea.setAlignment(Pos.CENTER);
+		endArea.getChildren().addAll(toLabel, endDate);
+		
+		FlatButton refreshBtn = new FlatButton("Refresh");
+		HBox dateArea = new HBox(20);
+		dateArea.setAlignment(Pos.CENTER);
+		dateArea.getChildren().addAll(startArea, endArea, refreshBtn);
+		
+		FlatButton viewDetails = new FlatButton("View Details");
+		
+		HBox bottom = new HBox(100);
+		bottom.setAlignment(Pos.CENTER);
+		bottom.getChildren().addAll(dateArea, viewDetails);
+		
+		ToolBar bottomBar = new ToolBar();
+		bottomBar.setStyle("-fx-background-color: #074F76");
+		bottomBar.getItems().add(bottom);
+		
+		
+		//Adding functions to buttons
+		refreshBtn.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent arg0) {
+				try {
+					LocalDate from = startDate.getValue();
+					LocalDate to = endDate.getValue();
+					if(to.isBefore(from)) {
+						Alert al = new Alert(AlertType.ERROR, "The \"from\" date is before the \"to\" date", ButtonType.OK);
+						al.showAndWait();
+						return;
+					}
+					bills.getItems().clear();
+					for(Bill b : c.getBills()) {
+						if(b.getDateCreated().isBetween(from, to)) {
+							bills.getItems().add(b);
+						}
+					}
+					table.setContent(bills);
+				}catch(NullPointerException ex) {
+					Alert al = new Alert(AlertType.ERROR, "Please fill in the date fields", ButtonType.OK);
+					al.showAndWait();
+				}
+			}
+		});
+		
+		viewDetails.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent arg0) {
+				try {
+					Bill b = bills.getSelectionModel().getSelectedItem();
+					Stage billStage = new Stage();
+					billStage.setTitle("Bill Data");
+					billStage.getIcons().add(SharedElements.getIcon().getImage());
+					billStage.initModality(Modality.APPLICATION_MODAL);
+					billStage.setResizable(false);
+					
+					String billData = "";
+					File file = new File("files" + File.separator + "bills" + File.separator +
+							b.getOwner().getName() + File.separator + b.getId() + ".txt");
+					try {
+						Scanner in = new Scanner(file);
+						while(in.hasNextLine()) {
+							billData += in.nextLine();
+							billData += "\n";
+						}
+						in.close();
+					} catch (FileNotFoundException e) {
+						Alert al = new Alert(AlertType.ERROR, "Cannot retrieve bill data", ButtonType.OK);
+						al.showAndWait();
+						e.printStackTrace();
+					}
+					
+					ScrollPane main = new ScrollPane();
+					main.setContent(new Label(billData));
+					main.setPrefHeight(300);
+					
+					FlatButton okBtn = new FlatButton("Ok");
+					okBtn.setOnAction(new EventHandler<ActionEvent>() {
+						@Override
+						public void handle(ActionEvent arg0) {
+							billStage.close();
+						}
+					});
+					
+					VBox layout = new VBox(20);
+					layout.setAlignment(Pos.CENTER);
+					layout.getChildren().addAll(SharedElements.getHeader("Bill nr: " + b.getId(), 0, 60), main, okBtn);
+					Scene billScene = new Scene(layout);
+					billStage.setScene(billScene);
+					billStage.showAndWait();
+				} catch(NullPointerException ex) {
+					Alert al = new Alert(AlertType.ERROR, "No Bill selected", ButtonType.OK);
+					al.showAndWait();
+				}
+			}
+		});
+		
+		BorderPane layout = new BorderPane();
+		layout.setTop(SharedElements.getHeader(c.getName() + "'s Bills", 0, 60));
+		layout.setCenter(table);
+		layout.setBottom(bottomBar);
+		
+		Scene statsScene = new Scene(layout, 800, 500);
+		statsStage.setResizable(false);
+		statsStage.setScene(statsScene);
+		statsStage.showAndWait();
 	}
 	
 	public static ImageView getIcon() {
@@ -624,7 +781,7 @@ public class SharedElements {
 		logoImg.setFitWidth(150);
 		logoImg.setFitHeight(150);
 		logoImg.setPreserveRatio(true);
-		logoImg.setImage(new Image("resources\\logo.png"));
+		logoImg.setImage(new Image("resources" + File.separator + "logo.png"));
 		return logoImg;
 	}
 	
@@ -636,6 +793,18 @@ public class SharedElements {
 		searchImgView.setImage(new Image("resources" + File.separator + "search.png"));
 		return searchImgView;
 	}
-
-
+	
+	public static StackPane getHeader(String header, int width, int height) {
+		StackPane sp = new StackPane();
+		sp.setStyle("-fx-background-color: #074F76");
+		sp.setAlignment(Pos.CENTER);
+		if(width != 0) sp.setPrefWidth(width);
+		if(height != 0) sp.setPrefHeight(height);
+		Label lbl = new Label(header);
+		lbl.setFont(new Font(20));
+		lbl.setStyle("-fx-text-fill: White");
+		
+		sp.getChildren().add(lbl);
+		return sp;
+	}
 }

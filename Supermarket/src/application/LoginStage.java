@@ -1,5 +1,6 @@
 package application;
 
+import data.ProductIO;
 import data.UserIO;
 import employees.Admin;
 import employees.Cashier;
@@ -23,7 +24,10 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import products.Product;
 import util.FlatButton;
+import util.Notification;
+import util.NotificationManager;
 import util.SharedElements;
 
 
@@ -31,6 +35,16 @@ public class LoginStage {
 	
 	public void view(Stage previousStage, UserIO uio) {
 		Stage loginStage = new Stage();
+		
+		ProductIO pio = new ProductIO();
+		NotificationManager nm = new NotificationManager();
+		
+		for(Product p : pio.getProducts()) {
+			if(p.hasExpired()) {
+				nm.addNotification(new Notification("Application", "Administrator", p.getName() + " has expired"));
+				nm.addNotification(new Notification("Application", "Economist", p.getName() + " has expired"));
+			}
+		}
 		
 		BorderPane loginLayout = new BorderPane();
 		StackPane leftArea = new StackPane();

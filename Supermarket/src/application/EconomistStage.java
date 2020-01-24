@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import data.ProductIO;
 import data.UserIO;
 import employees.Admin;
+import employees.Cashier;
 import employees.Economist;
 import employees.User;
 import javafx.collections.FXCollections;
@@ -77,7 +78,7 @@ public class EconomistStage {
 		incomeImg.setFitWidth(50);
 		incomeImg.setPreserveRatio(true);
 			
-		ImageView notifIV = new ImageView(new Image("resources" + File.separator + "alert.png"));
+		ImageView notifIV = new ImageView(new Image("resources" + File.separator + "notification.png"));
 		notifIV.setFitHeight(50);
 		notifIV.setFitWidth(50);
 		notifIV.setPreserveRatio(true);
@@ -173,6 +174,24 @@ public class EconomistStage {
 				}
 			}
 		});
+		
+		statsUserButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent arg0) {
+				try {
+					User u = (User) userData.getSelectionModel().getSelectedItem();
+					if(u instanceof Cashier) {
+						SharedElements.viewStatistics((Cashier) u);
+					}else {
+						Alert al = new Alert(AlertType.WARNING, "No data is available for that user type", ButtonType.OK);
+						al.showAndWait();
+					}
+				} catch (NullPointerException ex) {
+					Alert al = new Alert(AlertType.ERROR, "No user selected", ButtonType.OK);
+					al.showAndWait();
+				}
+			}
+		});
 			
 		removeProductButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
@@ -186,7 +205,7 @@ public class EconomistStage {
 		});
 			
 			
-		topBar.getItems().addAll(usersButton, productsButton, incomeButton, logOutButton);
+		topBar.getItems().addAll(usersButton, productsButton, incomeButton, notificationButton, logOutButton);
 		usersButtonTbar.getChildren().addAll(statsUserButton);
 		mainWindow.setTop(topBar);
 		Scene economistScene = new Scene(mainWindow, 1024, 576);

@@ -28,6 +28,21 @@ public class SimpleDate implements Serializable{
 		this.year = date.getYear();
 	}
 	
+	public boolean isBetween(LocalDate from, LocalDate to) {
+		boolean flag = false;
+		LocalDate date = this.toLocalDate();
+		while(true) {
+			from = from.plusDays(1);
+			if(from.equals(date)) {
+				flag = true;
+				break;
+			}
+			if(from.getDayOfMonth() == to.getDayOfMonth() && from.getMonthValue() == to.getMonthValue() 
+					&& from.getYear() == to.getYear()) break;
+		}
+		return flag;
+	}
+	
 	public LocalDate toLocalDate() {
 		LocalDate d = LocalDate.of(year, month, day);
 		return d;

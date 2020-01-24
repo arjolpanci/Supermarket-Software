@@ -34,6 +34,7 @@ import products.Product;
 import util.FlatButton;
 import util.NotEnoughQuantityException;
 import util.SharedElements;
+import util.SimpleDate;
 
 public class CashierStage {
 	
@@ -133,7 +134,6 @@ public class CashierStage {
 		billView.setBottom(billLayout);
 		
 		
-		
 		//Setting up button's images
 		ImageView cashRegisterIV = new ImageView();
 		Image cashRegisterImg = new Image("resources" + File.separator + "cashregister.png");
@@ -186,7 +186,7 @@ public class CashierStage {
 							int nqty = p.getQuantity() + qty;
 							billproducts.remove(p);
 							Product newpr = new Product(pr.getName(), pr.getSupplier(), 
-									nqty, pr.getPriceForQuantity(nqty), pr.getBarcode());
+									nqty, pr.getPriceForQuantity(nqty), pr.getBarcode(), new SimpleDate(pr.getExpireDate()));
 							billproducts.add(newpr);
 							refresh();
 							billView.setCenter(billData);
@@ -198,7 +198,7 @@ public class CashierStage {
 						refresh(pio);
 						productsView.setCenter(productData);
 						Product newpr = new Product(pr.getName(), pr.getSupplier(),
-								qty, pr.getPriceForQuantity(qty), pr.getBarcode());
+								qty, pr.getPriceForQuantity(qty), pr.getBarcode(), new SimpleDate(pr.getExpireDate()));
 						billproducts.add(newpr);
 						refresh();
 						billView.setCenter(billData);

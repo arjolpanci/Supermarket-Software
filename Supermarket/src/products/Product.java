@@ -1,9 +1,11 @@
 package products;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 
 import data.ProductIO;
 import util.NotEnoughQuantityException;
+import util.SimpleDate;
 
 public class Product implements Serializable{
 	
@@ -12,13 +14,15 @@ public class Product implements Serializable{
 	private int quantity;
 	private float price;
 	private int barcode;
+	private LocalDate expireDate;
 	
-	public Product(String name, String supplier, int quantity, float price, int barcode) {
+	public Product(String name, String supplier, int quantity, float price, int barcode, SimpleDate expire) {
 		this.name = name;
 		this.supplier = supplier;
 		this.quantity = quantity;
 		this.price = price;
 		this.barcode = barcode;
+		this.expireDate = expire.toLocalDate();
 	}
 	
 	public void updateQuantity(int qty, ProductIO pio) throws NotEnoughQuantityException{
@@ -31,6 +35,12 @@ public class Product implements Serializable{
 	
 	public float getPriceForQuantity(int qty) {
 		return qty * price;
+	}
+	
+	public boolean hasExpired() {
+		if(expireDate.isAfter(LocalDate.now())) return true;
+		if(expireDate.isEqual(LocalDate.now())) return true;
+		return false;
 	}
 
 	public String getName() { return name; }
@@ -47,5 +57,8 @@ public class Product implements Serializable{
 
 	public int getBarcode() { return barcode; }
 	public void setBarcode(int barcode) { this.barcode = barcode; }
+	
+	public LocalDate getExpireDate() { return expireDate; }
+	public void setExpireDate(SimpleDate expireDate) { this.expireDate = expireDate.toLocalDate(); }
 	
 }

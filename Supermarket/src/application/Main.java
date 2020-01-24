@@ -1,5 +1,6 @@
 package application;
 
+
 import data.UserIO;
 import javafx.application.Application;
 import javafx.scene.control.Alert;
@@ -13,6 +14,7 @@ public class Main extends Application{
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		UserIO uio = new UserIO();
+
 		if(uio.isFirstTime() || uio.getAdminsCount() == 0) {
 			Alert al = new Alert(AlertType.INFORMATION, "First time usage, enter Administrator details", ButtonType.OK);
 			al.showAndWait();

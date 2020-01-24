@@ -9,6 +9,8 @@ import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
@@ -34,6 +36,11 @@ public class Notification implements Serializable{
 		notificationStage.initStyle(StageStyle.UNDECORATED);
 		notificationStage.initModality(Modality.APPLICATION_MODAL);
 		
+		ScrollPane sp = new ScrollPane();
+		sp.setPrefWidth(370);
+		sp.setPrefHeight(50);
+		sp.setStyle("-fx-background: #074F76");
+		
 		HBox layout = new HBox(30);
 		layout.setAlignment(Pos.CENTER);
 		layout.setPrefSize(600, 130);
@@ -45,10 +52,18 @@ public class Notification implements Serializable{
 		alertIV.setPreserveRatio(true);
 		alertIV.setImage(new Image("resources" + File.separator + "alert.png"));
 		
+		TextArea msgArea = new TextArea();
+		msgArea.setText(this.getMessage());
+		msgArea.setStyle("-fx-control-inner-background: #074F76; -fx-text-fill: White; "
+				+ "-fx-focus-color: transparent; -fx-text-box-border: transparent;");
+		msgArea.setFont(new Font(26));
+		msgArea.setPrefSize(370, 50);
+		msgArea.setEditable(false);
 		Label message = new Label(this.getMessage());
-		Font fnt = new Font(32);
+		Font fnt = new Font(26);
 		message.setStyle("-fx-text-fill: White");
 		message.setFont(fnt);
+		sp.setContent(msgArea);
 		
 		FlatButton okBtn = new FlatButton("Ok");
 		okBtn.setStyle("-fx-font-size: 20");
@@ -61,7 +76,7 @@ public class Notification implements Serializable{
 			}
 		});
 		
-		layout.getChildren().addAll(alertIV, message, okBtn);
+		layout.getChildren().addAll(alertIV, msgArea, okBtn);
 		Scene notificationScene = new Scene(layout, 600, 130);
 		notificationStage.setScene(notificationScene);
 		notificationStage.showAndWait();

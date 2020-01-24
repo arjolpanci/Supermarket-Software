@@ -28,14 +28,12 @@ public class Bill implements Serializable{
 		setbillId();
 	}
 	
-	public int getId() { return id;	}
 	
 	public void addProduct(Product product) {
 		products.add(product);
 	}
 	
 	private void setbillId() {
-		int index = 0;
 		int newid;
 		if(owner.getBills().size() != 0) {
 			newid = owner.getBills().get(owner.getBills().size() - 1).getId();
@@ -44,13 +42,6 @@ public class Bill implements Serializable{
 		}
 		this.id = ++newid;
 	}
-
-	public ArrayList<Product> getProducts() { return products; }
-	
-	public SimpleDate getDateCreated() { return dateCreated; }
-
-	public double getTotal() { return total; }
-	public void setTotal(double total) { this.total = total; }
 
 	public void toFile() {
 		try {
@@ -76,5 +67,12 @@ public class Bill implements Serializable{
 		}
 
 	}
+	
+	public int getId() { return id;	}
+	public double getTotal() { return total; }
+	public void setTotal(double total) { this.total = total; }
+	public ArrayList<Product> getProducts() { return products; }
+	public SimpleDate getDateCreated() { return dateCreated; }
+	public Cashier getOwner() { return owner; }
 	
 }

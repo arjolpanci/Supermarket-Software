@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import data.ProductIO;
 import data.UserIO;
 import employees.Admin;
+import employees.Cashier;
 import employees.User;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -79,7 +80,7 @@ public class AdminStage {
 		incomeImg.setFitWidth(50);
 		incomeImg.setPreserveRatio(true);
 		
-		ImageView notifIV = new ImageView(new Image("resources" + File.separator + "alert.png"));
+		ImageView notifIV = new ImageView(new Image("resources" + File.separator + "notification.png"));
 		notifIV.setFitHeight(50);
 		notifIV.setFitWidth(50);
 		notifIV.setPreserveRatio(true);
@@ -175,7 +176,25 @@ public class AdminStage {
 					mainPane.setContent(userData);
 				} catch (NullPointerException ex) {
 					Alert al = new Alert(AlertType.ERROR, "No user selected", ButtonType.OK);
-					al.show();
+					al.showAndWait();
+				}
+			}
+		});
+		
+		statsUserButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent arg0) {
+				try {
+					User u = (User) userData.getSelectionModel().getSelectedItem();
+					if(u instanceof Cashier) {
+						SharedElements.viewStatistics((Cashier) u);
+					}else {
+						Alert al = new Alert(AlertType.WARNING, "No data is available for that user type", ButtonType.OK);
+						al.showAndWait();
+					}
+				} catch (NullPointerException ex) {
+					Alert al = new Alert(AlertType.ERROR, "No user selected", ButtonType.OK);
+					al.showAndWait();
 				}
 			}
 		});
@@ -237,9 +256,6 @@ public class AdminStage {
 			}
 		});
 		
-
-		
-		
 		MenuBar menu = new MenuBar();
 		Menu logOut = new Menu();
 		Label logOutLabel = new Label("Log Out");
@@ -260,7 +276,7 @@ public class AdminStage {
 		mainWindow.setTop(top);
 		Scene adminScene = new Scene(mainWindow, 1024, 576);
 		adminScene.getStylesheets().add("style.css");
-		adminStage.setTitle("Admin Window");
+		adminStage.setTitle("Admin Window ( " + adm.getName() + " )");
 		adminStage.setScene(adminScene);
 		mainWindow.requestFocus();
 		adminStage.show();
@@ -275,7 +291,6 @@ public class AdminStage {
 			nm.removeNotification(n);
 			nm.update();
 		}
-		//nm.update();
 	}
 	
 	private TableView viewUsers(UserIO uio) {
@@ -333,9 +348,12 @@ public class AdminStage {
 		TableColumn<Product, Integer> column5 = new TableColumn<>("Barcode");
 		column5.setCellValueFactory(new PropertyValueFactory<>("barcode"));
 		
+		TableColumn<Product, String> column6 = new TableColumn<>("Expire Date");
+		column6.setCellValueFactory(new PropertyValueFactory<>("expireDate"));
+		
 		productsTable.setItems(products);
 		
-		productsTable.getColumns().addAll(column1, column2, column3, column4, column5);
+		productsTable.getColumns().addAll(column1, column2, column3, column4, column5, column6);
 		productsTable.setPlaceholder(new Label("No products data to display"));
 		productsTable.setPrefSize(1600, 1200);
 		
