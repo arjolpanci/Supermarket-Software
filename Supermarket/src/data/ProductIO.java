@@ -17,12 +17,13 @@ import products.Product;
 public class ProductIO {
 	
 	private ArrayList<Product> products;
-	private String path = "files\\products.bin";
+	private String path = "files" + File.separator + "products.bin";
 	private File file;
 	
 	public ProductIO() {
 		products = new ArrayList<Product>();
 		file = new File(path);
+		file.getParentFile().mkdirs();
 		if(file.exists()) {
 			read();
 		}else {

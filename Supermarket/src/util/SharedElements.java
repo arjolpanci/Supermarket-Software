@@ -297,6 +297,11 @@ public class SharedElements {
 				if(flag) {
 					Alert al = new Alert(AlertType.INFORMATION, "Action performed succesfully", ButtonType.OK);
 					al.showAndWait();
+					nameTField.clear();
+					surnameTField.clear();
+					usernameTField.clear();
+					passwordTField.clear();
+					birthdayField.setValue(null);
 				}
 				
 			}

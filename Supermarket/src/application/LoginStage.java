@@ -1,5 +1,7 @@
 package application;
 
+import java.io.File;
+
 import data.ProductIO;
 import data.UserIO;
 import employees.Admin;
@@ -64,7 +66,7 @@ public class LoginStage {
 		userImg.setFitWidth(30);
 		userImg.setFitHeight(30);
 		userImg.setPreserveRatio(true);
-		userImg.setImage(new Image("resources\\user.png"));
+		userImg.setImage(new Image("resources" + File.separator + "user.png"));
 		
 		TextField userTField = new TextField();
 		userTField.setPromptText("Username");
@@ -81,7 +83,7 @@ public class LoginStage {
 		pwImg.setFitWidth(30);
 		pwImg.setFitHeight(30);
 		pwImg.setPreserveRatio(true);
-		pwImg.setImage(new Image("resources\\key.png"));
+		pwImg.setImage(new Image("resources" + File.separator + "key.png"));
 		
 		PasswordField pwTField = new PasswordField();
 		pwTField.setPromptText("Password");
