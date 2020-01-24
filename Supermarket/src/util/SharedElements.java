@@ -303,7 +303,6 @@ public class SharedElements {
 					passwordTField.clear();
 					birthdayField.setValue(null);
 				}
-				
 			}
 		});
 		
