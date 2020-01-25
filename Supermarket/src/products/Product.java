@@ -12,14 +12,16 @@ public class Product implements Serializable{
 	private String name;
 	private String supplier;
 	private int quantity;
+	private float buyingprice;
 	private float price;
 	private int barcode;
 	private LocalDate expireDate;
 	
-	public Product(String name, String supplier, int quantity, float price, int barcode, SimpleDate expire) {
+	public Product(String name, String supplier, int quantity, float buyingprice, float price, int barcode, SimpleDate expire) {
 		this.name = name;
 		this.supplier = supplier;
 		this.quantity = quantity;
+		this.buyingprice = buyingprice;
 		this.price = price;
 		this.barcode = barcode;
 		this.expireDate = expire.toLocalDate();
@@ -51,6 +53,9 @@ public class Product implements Serializable{
 
 	public int getQuantity() { return quantity; }
 	public void setQuantity(int quantity) { this.quantity = quantity; }
+	
+	public float getBuyingprice() {	return buyingprice;	}
+	public void setBuyingprice(float buyingprice) {	this.buyingprice = buyingprice;	}
 
 	public float getPrice() { return price; }
 	public void setPrice(float price) { this.price = price; }

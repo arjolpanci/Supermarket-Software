@@ -91,18 +91,17 @@ public class EconomistStage {
 			
 		//Setting up the buttons for User View
 		FlatButton usersButton = new FlatButton("Users", userImg);
-		usersButton.setPrefSize(100, 85);
+		usersButton.setPrefSize(120, 85);
 		FlatButton productsButton = new FlatButton("Products", productsImg);
-		productsButton.setPrefSize(100, 85);
+		productsButton.setPrefSize(120, 85);
 		FlatButton incomeButton = new FlatButton("Income", incomeImg);
-		incomeButton.setPrefSize(100, 85);
-		FlatButton notificationButton = new FlatButton("Notification", notifIV);
-		notificationButton.setPrefSize(100, 85);
+		incomeButton.setPrefSize(120, 85);
+		FlatButton notificationButton = new FlatButton("Notifications", notifIV);
+		notificationButton.setPrefSize(120, 85);
 		FlatButton logOutButton = new FlatButton("Log Out", logoutIV);
 		logOutButton.setPrefSize(120, 85);
 		
-		FlatButton statsUserButton = new FlatButton("View Statistics");
-		
+		FlatButton statsUserButton = new FlatButton("View Bills");
 		
 		//Setting up buttons for Product View
 		FlatButton addProductButton = new FlatButton("Add Product");
@@ -210,7 +209,7 @@ public class EconomistStage {
 		mainWindow.setTop(topBar);
 		Scene economistScene = new Scene(mainWindow, 1024, 576);
 		economistScene.getStylesheets().add("style.css");
-		economistStage.setTitle("Economist Window");
+		economistStage.setTitle("Economist Window ( " + ecm.getName() + " )");
 		economistStage.setScene(economistScene);
 		mainWindow.requestFocus();
 		economistStage.show();		
@@ -277,15 +276,21 @@ public class EconomistStage {
 		TableColumn<Product, Integer> column3 = new TableColumn<>("Quantity");
 		column3.setCellValueFactory(new PropertyValueFactory<>("quantity"));
 		
-		TableColumn<Product, Integer> column4 = new TableColumn<>("Price");
-		column4.setCellValueFactory(new PropertyValueFactory<>("price"));
+		TableColumn<Product, Integer> column4 = new TableColumn<>("Product Price");
+		column4.setCellValueFactory(new PropertyValueFactory<>("buyingprice"));
 		
-		TableColumn<Product, Integer> column5 = new TableColumn<>("Barcode");
-		column5.setCellValueFactory(new PropertyValueFactory<>("barcode"));
+		TableColumn<Product, Integer> column5 = new TableColumn<>("Selling Price");
+		column5.setCellValueFactory(new PropertyValueFactory<>("price"));
+		
+		TableColumn<Product, Integer> column6 = new TableColumn<>("Barcode");
+		column6.setCellValueFactory(new PropertyValueFactory<>("barcode"));
+		
+		TableColumn<Product, String> column7 = new TableColumn<>("Expire Date");
+		column7.setCellValueFactory(new PropertyValueFactory<>("expireDate"));
 		
 		productsTable.setItems(products);
 		
-		productsTable.getColumns().addAll(column1, column2, column3, column4, column5);
+		productsTable.getColumns().addAll(column1, column2, column3, column4, column5, column6, column7);
 		productsTable.setPlaceholder(new Label("No products data to display"));
 		productsTable.setPrefSize(1600, 1200);
 		

@@ -34,6 +34,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -266,7 +267,6 @@ public class SharedElements {
 								adm.setId(1);
 								uio.addUser(adm);
 								addUserStage.close();
-								return;
 							}
 							uio.addUser(adm);
 							flag = true;
@@ -302,6 +302,7 @@ public class SharedElements {
 					usernameTField.clear();
 					passwordTField.clear();
 					birthdayField.setValue(null);
+					salaryField.clear();
 				}
 			}
 		});
@@ -399,11 +400,20 @@ public class SharedElements {
 		quantityArea.setAlignment(Pos.CENTER);
 		quantityArea.getChildren().addAll(quantityLabel, quantityTField);
 		
+		TextField buyingpriceTField = new TextField();
+		buyingpriceTField.getStyleClass().add("textfield");
+		buyingpriceTField.setPrefWidth(200);
+		buyingpriceTField.setPromptText("Enter Product Price ...");
+		Label buyingpriceLabel = new Label("Product Price: ");
+		HBox buyingpriceArea = new HBox(20);
+		buyingpriceArea.setAlignment(Pos.CENTER);
+		buyingpriceArea.getChildren().addAll(buyingpriceLabel, buyingpriceTField);
+		
 		TextField priceTField = new TextField();
 		priceTField.getStyleClass().add("textfield");
 		priceTField.setPrefWidth(200);
 		priceTField.setPromptText("Enter Selling Price ...");
-		Label priceLabel = new Label("Price: ");
+		Label priceLabel = new Label("Selling Price: ");
 		HBox priceArea = new HBox(20);
 		priceArea.setAlignment(Pos.CENTER);
 		priceArea.getChildren().addAll(priceLabel, priceTField);
@@ -423,10 +433,10 @@ public class SharedElements {
 		expireArea.setAlignment(Pos.CENTER);
 		expireArea.getChildren().addAll(expireLabel, dateField);
 		
-		dataArea.getChildren().addAll(existingArea, nameArea, supplierArea, quantityArea, priceArea, barcodeArea, buttonArea, expireArea);
+		dataArea.getChildren().addAll(existingArea, nameArea, supplierArea, quantityArea, buyingpriceArea, priceArea, barcodeArea, buttonArea, expireArea);
 		fullLayout.getChildren().addAll(dataArea, buttonArea);
 		finalLayout.getChildren().addAll(SharedElements.getHeader("Add Product", 0, 60), fullLayout);
-		Scene addProductScene = new Scene(finalLayout, 400,460);
+		Scene addProductScene = new Scene(finalLayout, 400,520);
 		addProductScene.getStylesheets().add("style.css");
 		
 		
@@ -438,14 +448,16 @@ public class SharedElements {
 					String name = nameTField.getText();
 					String supplier = supplierTField.getText();
 					int quantity = Integer.parseInt(quantityTField.getText());
+					float buyingprice = Float.parseFloat(buyingpriceTField.getText());
 					float price = Float.parseFloat(priceTField.getText());
 					int barcode = Integer.parseInt(barcodeTField.getText());
-					pio.addProduct(new Product(name, supplier, quantity, price, barcode, new SimpleDate(dateField.getValue())));
+					pio.addProduct(new Product(name, supplier, quantity, buyingprice, price, barcode, new SimpleDate(dateField.getValue())));
 					Alert al = new Alert(AlertType.INFORMATION, "Action performed succesfully", ButtonType.OK);
 					al.showAndWait();
 					nameTField.clear();
 					supplierTField.clear();
 					quantityTField.clear();
+					buyingpriceTField.clear();
 					priceTField.clear();
 					barcodeTField.clear();
 					dateField.setValue(null);
@@ -779,6 +791,121 @@ public class SharedElements {
 		statsStage.setResizable(false);
 		statsStage.setScene(statsScene);
 		statsStage.showAndWait();
+	}
+	
+	public static void initialView(UserIO uio) {
+		Stage initialstg = new Stage();
+		initialstg.getIcons().add(SharedElements.getIcon().getImage());
+		initialstg.initModality(Modality.APPLICATION_MODAL);
+		initialstg.setTitle("Welcome");
+		
+		//initial Scene
+		BorderPane layout = new BorderPane();
+		VBox main = new VBox(20);
+		main.setAlignment(Pos.CENTER);
+		main.setStyle("-fx-background-color: #074F76");
+		FlatButton nxtButton = new FlatButton("Next", 100, 50);
+		nxtButton.setFont(new Font(20));
+		main.getChildren().addAll(SharedElements.getIcon(), 
+				SharedElements.getHeader("Welcome to Supermarket Software 1.0", 0, 0), nxtButton);
+		layout.setCenter(main);
+		Scene firstScene = new Scene(layout, 600, 300);
+		
+		
+		//Adding Admin details Scene
+		BorderPane addlayout = new BorderPane();
+		addlayout.setTop(SharedElements.getHeader("Add Administrator Data", 0, 60));
+		
+		TextField nameTField = new TextField();
+		nameTField.getStyleClass().add("textfield");
+		nameTField.setPrefWidth(200);
+		nameTField.setPromptText("Enter Name ...");
+		Label nameLabel = new Label("First Name: ");
+		HBox nameArea = new HBox(20);
+		nameArea.setAlignment(Pos.CENTER);
+		nameArea.getChildren().addAll(nameLabel, nameTField);
+		
+		TextField surnameTField = new TextField();
+		surnameTField.getStyleClass().add("textfield");
+		surnameTField.setPrefWidth(200);
+		surnameTField.setPromptText("Enter Surname ...");
+		Label surnameLabel = new Label("Last Name: ");
+		HBox surnameArea = new HBox(20);
+		surnameArea.setAlignment(Pos.CENTER);
+		surnameArea.getChildren().addAll(surnameLabel, surnameTField);
+		
+		TextField usernameTField = new TextField();
+		usernameTField.getStyleClass().add("textfield");
+		usernameTField.setPrefWidth(200);
+		usernameTField.setPromptText("Enter Username ...");
+		Label usernameLabel = new Label("Username: ");
+		HBox usernameArea = new HBox(20);
+		usernameArea.setAlignment(Pos.CENTER);
+		usernameArea.getChildren().addAll(usernameLabel, usernameTField);
+		
+		TextField passwordTField = new TextField();
+		passwordTField.getStyleClass().add("textfield");
+		passwordTField.setPrefWidth(200);
+		passwordTField.setPromptText("Enter Password ...");
+		Label passwordLabel = new Label("Password: ");
+		HBox passwordArea = new HBox(20);
+		passwordArea.setAlignment(Pos.CENTER);
+		passwordArea.getChildren().addAll(passwordLabel, passwordTField);
+		
+		DatePicker birthdayField = new DatePicker();
+		Label dateLabel = new Label("Birthday: ");
+		HBox birthdayArea = new HBox(20);
+		birthdayArea.setAlignment(Pos.CENTER);
+		birthdayArea.getChildren().addAll(dateLabel, birthdayField);
+		
+		VBox dataArea = new VBox(35);
+		dataArea.setAlignment(Pos.CENTER);
+		dataArea.getChildren().addAll(nameArea, surnameArea, usernameArea, passwordArea, birthdayArea);
+		addlayout.setCenter(dataArea);
+		
+		FlatButton nextButton = new FlatButton("Next", 100, 50);
+		HBox bottom = new HBox();
+		bottom.setAlignment(Pos.CENTER_RIGHT);
+		bottom.setStyle("-fx-background-color: #074F76");
+		bottom.getChildren().add(nextButton);
+		addlayout.setBottom(bottom);
+		
+		Scene secondScene = new Scene(addlayout, 400, 400);
+		secondScene.getStylesheets().add("style.css");
+		
+		nxtButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent arg0) {
+				initialstg.setScene(secondScene);
+			}
+		});
+		
+		nextButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent arg0) {
+				try {
+					if(nameTField.getText().equals("") || surnameTField.getText().equals("") ||
+							usernameTField.getText().equals("") || passwordTField.getText().equals("") || birthdayField.getValue().equals(null)) {
+						Alert al = new Alert(AlertType.ERROR, "Please fill in all the data", ButtonType.OK);
+						al.show();
+					}else {
+						Admin adm = new Admin(nameTField.getText(), surnameTField.getText(), usernameTField.getText(),
+								passwordTField.getText(), new SimpleDate(birthdayField.getValue()));
+						adm.setId(1);
+						uio.addUser(adm);
+						initialstg.close();
+						return;
+					}
+				}catch (Exception ex) {
+                	Alert al = new Alert(AlertType.ERROR, "Cannot process request", ButtonType.OK);
+                	al.show();
+				}
+			}
+		});
+		
+		initialstg.setScene(firstScene);
+		main.requestFocus();
+		initialstg.showAndWait();
 	}
 	
 	public static ImageView getIcon() {

@@ -2,6 +2,7 @@ package application;
 
 
 import data.UserIO;
+import employees.User;
 import javafx.application.Application;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -14,17 +15,15 @@ public class Main extends Application{
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		UserIO uio = new UserIO();
-
+		
 		if(uio.isFirstTime() || uio.getAdminsCount() == 0) {
-			Alert al = new Alert(AlertType.INFORMATION, "First time usage, enter Administrator details", ButtonType.OK);
-			al.showAndWait();
-			SharedElements.addUserView(primaryStage, uio);
+			SharedElements.initialView(uio);
 			uio.update();
 			LoginStage lgs = new LoginStage();
 			lgs.view(primaryStage, uio);
 		}else {
 			LoginStage lgs = new LoginStage();
-			lgs.view(primaryStage, uio);	
+			lgs.view(primaryStage, uio);
 		}
 	}
 	
