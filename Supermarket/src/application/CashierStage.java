@@ -43,10 +43,12 @@ public class CashierStage {
 	private TableView<Product> productData;
 	private TableView<Product> billData;
 	private float total = 0;
-	
+	private ArrayList<Product> saved = new ArrayList<Product>();
+
 	public void view(Stage previousStage, Cashier cashier, UserIO uio) {
 		ProductIO pio = new ProductIO();
-		
+
+
 		Stage cashierStage = new Stage();
 		cashierStage.getIcons().add(SharedElements.getIcon().getImage());
 		SplitPane cashRegView = new SplitPane();
@@ -177,6 +179,13 @@ public class CashierStage {
 				try {
 					int qty = Integer.parseInt(quantityTextField.getText());
 					Product pr = productData.getSelectionModel().getSelectedItem();
+					
+					try {
+						saved.add((Product) pr.clone());
+					} catch (CloneNotSupportedException e) {
+						e.printStackTrace();
+					}
+					
 					boolean flag = false;
 					for(Product p : billproducts) {
 						if(p.getName().equals(pr.getName())) {
@@ -237,17 +246,36 @@ public class CashierStage {
 		clearButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent arg0) {
-				billproducts.clear();
-				refresh();
+				if(!billData.getItems().isEmpty()){
+					for(Product p : saved){
+						pio.reAdd(p);
+					}
+					billproducts.clear();
+					products.clear();
+					refresh();
+					refresh(pio);
+					productData = viewProducts(pio);
+					productsView.setCenter(productData);
+				}
 			}
 		});
 		
 		deleteButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent arg0) {
-				Product pr = billData.getSelectionModel().getSelectedItem();
-				billproducts.remove(pr);
-				refresh();
+				if(!billData.getItems().isEmpty()){
+					for(Product p : saved){
+						pio.reAdd(p);
+					}
+					Product pr = billData.getSelectionModel().getSelectedItem();
+					billproducts.remove(pr);
+					refresh();
+					products.clear();
+					refresh(pio);
+					productData = viewProducts(pio);
+					productsView.setCenter(productData);
+				}
+
 			}
 		});
 		

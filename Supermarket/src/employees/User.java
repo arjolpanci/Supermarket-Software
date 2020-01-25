@@ -47,5 +47,10 @@ public abstract class User implements Serializable{
 
 	public int getSalary() { return salary; }
 	public void setSalary(int salary) { this.salary = salary; }
+	
+	@Override
+	public String toString() {
+		return this.getName();
+	}
 
 }

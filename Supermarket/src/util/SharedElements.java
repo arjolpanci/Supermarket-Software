@@ -6,7 +6,9 @@ import java.time.LocalDate;
 import java.util.Scanner;
 
 import data.Bill;
+import data.FinancialAction;
 import data.ProductIO;
+import data.SaleManager;
 import data.UserIO;
 import employees.Admin;
 import employees.Cashier;
@@ -34,7 +36,6 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -451,7 +452,7 @@ public class SharedElements {
 					float buyingprice = Float.parseFloat(buyingpriceTField.getText());
 					float price = Float.parseFloat(priceTField.getText());
 					int barcode = Integer.parseInt(barcodeTField.getText());
-					pio.addProduct(new Product(name, supplier, quantity, buyingprice, price, barcode, new SimpleDate(dateField.getValue())));
+					pio.addProduct(new Product(name, supplier, quantity, buyingprice, price, barcode, new SimpleDate(dateField.getValue())), true);
 					Alert al = new Alert(AlertType.INFORMATION, "Action performed succesfully", ButtonType.OK);
 					al.showAndWait();
 					nameTField.clear();
@@ -461,6 +462,10 @@ public class SharedElements {
 					priceTField.clear();
 					barcodeTField.clear();
 					dateField.setValue(null);
+					existingCBox.getItems().remove(1, existingCBox.getItems().size());
+					for(Product p : pio.getProducts()) {
+						existingCBox.getItems().add(p.getName());
+					}
 				} catch (Exception ex) {
 					Alert al = new Alert(AlertType.ERROR, "Cannot Process Request", ButtonType.OK);
 					al.setTitle("Error");
@@ -501,6 +506,8 @@ public class SharedElements {
 					supplierTField.setDisable(true);
 					supplierTField.setText(p.getName());
 					quantityTField.setText("" + p.getQuantity());
+					buyingpriceTField.setDisable(true);
+					buyingpriceTField.setText("" + p.getBuyingprice());
 					priceTField.setText("" + p.getPrice());
 					barcodeTField.setDisable(true);
 					barcodeTField.setText("" + p.getBarcode());
@@ -561,7 +568,7 @@ public class SharedElements {
 						pio.removeProduct(p);
 						p.setQuantity(newqty);
 						p.setPrice(newprice);
-						pio.addProduct(p);
+						pio.addProduct(p, true);
 						pio.update();
 						Alert al = new Alert(AlertType.INFORMATION, "Action performed succesfully", ButtonType.OK);
 						al.setTitle("Information");
@@ -906,6 +913,170 @@ public class SharedElements {
 		initialstg.setScene(firstScene);
 		main.requestFocus();
 		initialstg.showAndWait();
+	}
+	
+	public static void salesView() {
+		SaleManager sm = new SaleManager();
+		Stage saleStage = new Stage();
+		saleStage.initModality(Modality.APPLICATION_MODAL);
+		saleStage.setTitle("Sales");
+		saleStage.getIcons().add(SharedElements.getIcon().getImage());
+		
+		BorderPane mainWindow = new BorderPane();
+		mainWindow.setTop(SharedElements.getHeader("Financials", 0, 60));
+		
+		TableView<FinancialAction> tb = new TableView<FinancialAction>();
+		TableColumn<FinancialAction, String> column1 = new TableColumn<>("Date");
+		column1.setCellValueFactory(new PropertyValueFactory<>("date"));
+		TableColumn<FinancialAction, User> column2 = new TableColumn<>("Employee Salary");
+		column2.setCellValueFactory(new PropertyValueFactory<>("actionUser"));
+		TableColumn<FinancialAction, Product> column3 = new TableColumn<>("Product Expense / Income");
+		column3.setCellValueFactory(new PropertyValueFactory<>("actionProduct"));
+		TableColumn<FinancialAction, Integer> column4 = new TableColumn<>("Amount");
+		column4.setCellValueFactory(new PropertyValueFactory<>("amount"));
+		tb.getColumns().addAll(column1, column2, column3, column4);
+		
+		float expenses = 0;
+		float income = 0;
+		float total = 0;
+		
+		for(FinancialAction fa : sm.getFinances()) {
+			tb.getItems().add(fa);
+			if(fa.getAmount() <= 0) expenses += fa.getAmount();
+			if(fa.getAmount() > 0) income += fa.getAmount();
+		}
+		
+		total = expenses + income;
+		
+		mainWindow.setCenter(tb);
+		
+		DatePicker startDate = new DatePicker();
+		Label fromLabel = new Label("From: ");
+		fromLabel.setStyle("-fx-text-fill: White");
+		HBox startArea = new HBox(10);
+		startArea.setAlignment(Pos.CENTER);
+		startArea.getChildren().addAll(fromLabel, startDate);
+		
+		DatePicker endDate = new DatePicker();
+		Label toLabel = new Label("To: ");
+		toLabel.setStyle("-fx-text-fill: White");
+		HBox endArea = new HBox(10);
+		endArea.setAlignment(Pos.CENTER);
+		endArea.getChildren().addAll(toLabel, endDate);
+		
+		FlatButton refreshBtn = new FlatButton("Refresh");
+		FlatButton detailsBtn = new FlatButton("View Details");
+		
+		HBox buttonArea = new HBox(25);
+		buttonArea.setAlignment(Pos.CENTER);
+		buttonArea.getChildren().addAll(startArea, endArea, refreshBtn, detailsBtn);
+		
+		HBox textArea = new HBox(40);
+		textArea.setAlignment(Pos.CENTER);
+		Label expenseLabel = new Label("Expenses: " + expenses + "$");
+		expenseLabel.setFont(new Font(18));
+		expenseLabel.setStyle("-fx-text-fill: Red");
+		Label profitLabel = new Label("Profit: " + income + "$");
+		profitLabel.setFont(new Font(18));
+		profitLabel.setStyle("-fx-text-fill: LightGreen");
+		Label netLabel = new Label("Net Income: " + total + "$");
+		netLabel.setFont(new Font(18));
+		netLabel.setStyle("-fx-text-fill: White");
+		textArea.getChildren().addAll(expenseLabel, profitLabel, netLabel);
+		
+		VBox bottom = new VBox(20);
+		bottom.setAlignment(Pos.CENTER);
+		bottom.setStyle("-fx-background-color: #074F76");
+		bottom.getChildren().addAll(buttonArea, textArea);
+
+		mainWindow.setBottom(bottom);
+		
+		//Adding functions to buttons
+		refreshBtn.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent arg0) {
+				try {
+					LocalDate from = startDate.getValue();
+					LocalDate to = endDate.getValue();
+					if(to.isBefore(from)) {
+						Alert al = new Alert(AlertType.ERROR, "The \"from\" date is before the \"to\" date", ButtonType.OK);
+						al.showAndWait();
+						return;
+					}
+					tb.getItems().clear();
+					float expenses = 0;
+					float income = 0;
+					float total = 0;
+					for(FinancialAction fa : sm.getFinances()) {
+						if(fa.getDate().isBetween(from, to)) {
+							tb.getItems().add(fa);
+							if(fa.getAmount() <= 0) expenses += fa.getAmount();
+							if(fa.getAmount() > 0) income += fa.getAmount();
+						}
+					}
+					total = expenses + income;
+					expenseLabel.setText("Expenses: " + expenses + "$");
+					profitLabel.setText("Profit: " + income + "$");
+					netLabel.setText("Net Income: " + total + "$");
+				}catch(NullPointerException ex) {
+					Alert al = new Alert(AlertType.ERROR, "Please fill in the date fields", ButtonType.OK);
+					al.showAndWait();
+				}
+			}
+		});
+		
+		detailsBtn.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent arg0) {
+				try {
+					FinancialAction fa = tb.getSelectionModel().getSelectedItem();
+					Stage stg = new Stage();
+					stg.initModality(Modality.APPLICATION_MODAL);
+					stg.setTitle("Financial Detail");
+					stg.setResizable(false);
+					
+					HBox sp = new HBox(20);
+					sp.setAlignment(Pos.CENTER);
+					sp.setStyle("-fx-background-color: #074F76");
+					Label lb = new Label();
+					lb.setFont(new Font(20));
+					lb.setStyle("-fx-text-fill: White");
+					if(fa.getAmount() < 0) {
+						if(fa.getActionProduct() != null) {
+							lb.setText("Bought " + fa.getActionProduct().getQuantity() + " of " + fa.getActionProduct().getName()
+									+ " for " + fa.getActionProduct().getBuyingprice() + "$ each");
+						}else {
+							lb.setText("Paid salary of " + fa.getActionUser().getName() + " for " + " " 
+						+ fa.getActionUser().getSalary() + "$" );
+						}
+					}else {
+						lb.setText("Sold " + fa.getActionProduct().getQuantity() + " of " + fa.getActionProduct().getName()
+								+ " for " + (fa.getActionProduct().getPrice()/fa.getActionProduct().getQuantity()) + "$ each");
+					}
+					FlatButton okBtn = new FlatButton("Ok");
+					sp.getChildren().addAll(lb, okBtn);
+					
+					okBtn.setOnAction(new EventHandler<ActionEvent>() {
+						@Override
+						public void handle(ActionEvent arg0) {
+							stg.close();
+						}
+					});
+					
+					Scene fscene = new Scene(sp, 600, 130);
+					stg.setScene(fscene);
+					stg.showAndWait();
+				}catch(NullPointerException ex) {
+					Alert al = new Alert(AlertType.ERROR, "No entry has been selected", ButtonType.OK);
+					al.showAndWait();
+				}
+			}
+		});
+		
+		
+		Scene saleScene = new Scene(mainWindow, 800, 500);
+		saleStage.setScene(saleScene);
+		saleStage.showAndWait();
 	}
 	
 	public static ImageView getIcon() {

@@ -39,8 +39,8 @@ public class LoginStage {
 	
 	public void view(Stage previousStage, UserIO uio) {
 		Stage loginStage = new Stage();
-		ProductIO pio = new ProductIO();
 		NotificationManager nm = new NotificationManager();
+		ProductIO pio = new ProductIO();
 		
 		for(Product p : pio.getProducts()) {
 			if(p.hasExpired()) {
@@ -49,8 +49,13 @@ public class LoginStage {
 				if(!nm.exits(na)) nm.addNotification(na);
 				if(!nm.exits(ne))nm.addNotification(ne);
 			}
+			if(p.getQuantity() <= 5) {
+				Notification na = new Notification("Application", "Administrator", p.getName() + " is close to running out");
+				Notification ne = new Notification("Application", "Economist", p.getName() + " is close to running out");
+				if(!nm.exits(na)) nm.addNotification(na);
+				if(!nm.exits(ne))nm.addNotification(ne);
+			}
 		}
-		
 		
 		BorderPane loginLayout = new BorderPane();
 		StackPane leftArea = new StackPane();
@@ -63,7 +68,6 @@ public class LoginStage {
 		buttonArea.setAlignment(Pos.CENTER);
 		VBox textboxArea = new VBox(40);
 		textboxArea.setAlignment(Pos.CENTER);
-		
 		
 		//Username textbox layout
 		ImageView userImg = new ImageView();

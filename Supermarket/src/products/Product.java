@@ -7,7 +7,7 @@ import data.ProductIO;
 import util.NotEnoughQuantityException;
 import util.SimpleDate;
 
-public class Product implements Serializable{
+public class Product implements Serializable, Cloneable{
 	
 	private String name;
 	private String supplier;
@@ -31,7 +31,7 @@ public class Product implements Serializable{
 		if(qty > quantity || qty < 0) throw new NotEnoughQuantityException(qty);
 		pio.removeProduct(this);
 		quantity -= qty;
-		pio.addProduct(this);
+		pio.addProduct(this, false);
 		pio.update();
 	}
 	
@@ -65,5 +65,14 @@ public class Product implements Serializable{
 	
 	public LocalDate getExpireDate() { return expireDate; }
 	public void setExpireDate(SimpleDate expireDate) { this.expireDate = expireDate.toLocalDate(); }
+
+	@Override
+	public Object clone() throws CloneNotSupportedException {
+		return super.clone();
+	}
 	
+	@Override
+	public String toString() {
+		return this.getName();
+	}
 }

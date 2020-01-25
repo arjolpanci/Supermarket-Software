@@ -45,6 +45,7 @@ public class Bill implements Serializable{
 
 	public void toFile() {
 		try {
+			SaleManager sm = new SaleManager();
 			File file = new File("files" + File.separator + "bills" + File.separator +
 					owner.getName() + File.separator + id + ".txt");
 			file.getParentFile().mkdirs();
@@ -53,6 +54,8 @@ public class Bill implements Serializable{
 			pwr.println("=====================================");
 			pwr.printf("%-20s%-10s%-5s\n", "Product", "Quantity" , "Price");
 			for(Product p : products){
+				FinancialAction fa = new FinancialAction(p, p.getPrice());
+				sm.addFinancialAction(fa);
 				pwr.printf("%-20s%-10s%-5s\n", p.getName(), p.getQuantity(), p.getPrice());
 			}
 			pwr.println("=====================================");

@@ -148,6 +148,13 @@ public class AdminStage {
 			}
 		});
 		
+		incomeButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent arg0) {
+				SharedElements.salesView();
+			}
+		});
+		
 		logOutButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent arg0) {
