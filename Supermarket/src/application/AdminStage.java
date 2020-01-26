@@ -32,6 +32,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import products.Product;
+import resources.ResourceManager;
 import util.FlatButton;
 import util.Notification;
 import util.NotificationManager;
@@ -65,27 +66,32 @@ public class AdminStage {
 		usersbottomBar.getItems().add(usersButtonTbar);
 		
 		//Setting up the button's images for top toolbar
-		ImageView userImg = new ImageView(new Image("resources" + File.separator + "man.png"));
+		//ImageView userImg = new ImageView(new Image("resources" + File.separator + "man.png"));
+		ImageView userImg = new ImageView(new Image(ResourceManager.manloc.toString()));
 		userImg.setFitHeight(50);
 		userImg.setFitWidth(50);
 		userImg.setPreserveRatio(true);
 		
-		ImageView productsImg = new ImageView(new Image("resources" + File.separator + "cart.png"));
+		//ImageView productsImg = new ImageView(new Image("resources" + File.separator + "cart.png"));
+		ImageView productsImg = new ImageView(new Image(ResourceManager.cartloc.toString()));
 		productsImg.setFitHeight(50);
 		productsImg.setFitWidth(50);
 		productsImg.setPreserveRatio(true);
 		
-		ImageView incomeImg = new ImageView(new Image("resources" + File.separator + "money.png"));
+		//ImageView incomeImg = new ImageView(new Image("resources" + File.separator + "money.png"));
+		ImageView incomeImg = new ImageView(new Image(ResourceManager.moneyloc.toString()));
 		incomeImg.setFitHeight(50);
 		incomeImg.setFitWidth(50);
 		incomeImg.setPreserveRatio(true);
 		
-		ImageView notifIV = new ImageView(new Image("resources" + File.separator + "notification.png"));
+		//ImageView notifIV = new ImageView(new Image("resources" + File.separator + "notification.png"));
+		ImageView notifIV = new ImageView(new Image(ResourceManager.notificationloc.toString()));
 		notifIV.setFitHeight(50);
 		notifIV.setFitWidth(50);
 		notifIV.setPreserveRatio(true);
 		
-		ImageView logoutIV = new ImageView(new Image("resources" + File.separator + "logout.png"));
+		//ImageView logoutIV = new ImageView(new Image("resources" + File.separator + "logout.png"));
+		ImageView logoutIV = new ImageView(new Image(ResourceManager.logoutloc.toString()));
 		logoutIV.setFitHeight(50);
 		logoutIV.setFitWidth(50);
 		logoutIV.setPreserveRatio(true);

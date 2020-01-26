@@ -29,6 +29,7 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import products.Product;
+import resources.ResourceManager;
 import util.FlatButton;
 import util.Notification;
 import util.NotificationManager;
@@ -74,7 +75,7 @@ public class LoginStage {
 		userImg.setFitWidth(30);
 		userImg.setFitHeight(30);
 		userImg.setPreserveRatio(true);
-		userImg.setImage(new Image("resources" + File.separator + "user.png"));
+		userImg.setImage(new Image(ResourceManager.userloc.toString()));
 		
 		TextField userTField = new TextField();
 		userTField.setPromptText("Username");
@@ -91,7 +92,8 @@ public class LoginStage {
 		pwImg.setFitWidth(30);
 		pwImg.setFitHeight(30);
 		pwImg.setPreserveRatio(true);
-		pwImg.setImage(new Image("resources" + File.separator + "key.png"));
+		//pwImg.setImage(new Image("resources" + File.separator + "key.png"));
+		pwImg.setImage(new Image(ResourceManager.keyloc.toString()));
 		
 		PasswordField pwTField = new PasswordField();
 		pwTField.setPromptText("Password");

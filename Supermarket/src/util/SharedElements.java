@@ -2,6 +2,7 @@ package util;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.net.URL;
 import java.time.LocalDate;
 import java.util.Scanner;
 
@@ -43,6 +44,7 @@ import javafx.scene.text.Font;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import products.Product;
+import resources.ResourceManager;
 
 public class SharedElements {
 	
@@ -1084,7 +1086,8 @@ public class SharedElements {
 		logoImg.setFitWidth(150);
 		logoImg.setFitHeight(150);
 		logoImg.setPreserveRatio(true);
-		logoImg.setImage(new Image("resources" + File.separator + "logo.png"));
+		//logoImg.setImage(new Image("resources" + File.separator + "logo.png"));
+		logoImg.setImage(new Image(ResourceManager.logoloc.toString()));
 		return logoImg;
 	}
 	
@@ -1093,7 +1096,8 @@ public class SharedElements {
 		searchImgView.setFitHeight(20);
 		searchImgView.setFitWidth(20);
 		searchImgView.setPreserveRatio(true);
-		searchImgView.setImage(new Image("resources" + File.separator + "search.png"));
+		//searchImgView.setImage(new Image("resources" + File.separator + "search.png"));
+		searchImgView.setImage(new Image(ResourceManager.searchloc.toString()));
 		return searchImgView;
 	}
 	

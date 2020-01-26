@@ -44,11 +44,15 @@ public class ProductIO {
 	}
 
 	public void reAdd(Product p){
+		Product toRemove = null;
 		for(Product pr : products){
 			if(pr.getName().equals(p.getName())){
-				this.removeProduct(pr);
-				this.addProduct(p, false);
+				toRemove = pr;
 			}
+		}
+		if(toRemove != null) {
+			this.removeProduct(toRemove);
+			this.addProduct(p, false);
 		}
 	}
 	

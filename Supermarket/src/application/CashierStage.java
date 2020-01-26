@@ -31,6 +31,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import products.Product;
+import resources.ResourceManager;
 import util.FlatButton;
 import util.NotEnoughQuantityException;
 import util.SharedElements;
@@ -138,7 +139,8 @@ public class CashierStage {
 		
 		//Setting up button's images
 		ImageView cashRegisterIV = new ImageView();
-		Image cashRegisterImg = new Image("resources" + File.separator + "cashregister.png");
+		//Image cashRegisterImg = new Image("resources" + File.separator + "cashregister.png");
+		Image cashRegisterImg = new Image(ResourceManager.cashregisterloc.toString());
 		cashRegisterIV.setFitHeight(50);
 		cashRegisterIV.setFitWidth(50);
 		cashRegisterIV.setPreserveRatio(true);
@@ -148,7 +150,8 @@ public class CashierStage {
 		logoutIV.setFitHeight(50);
 		logoutIV.setFitWidth(50);
 		logoutIV.setPreserveRatio(true);
-		logoutIV.setImage(new Image("resources" + File.separator + "logout.png"));
+		//logoutIV.setImage(new Image("resources" + File.separator + "logout.png"));
+		logoutIV.setImage(new Image(ResourceManager.logoutloc.toString()));
 		
 		//Setting up the main buttons
 		FlatButton cashRegisterButton = new FlatButton("Cash Register", cashRegisterIV);

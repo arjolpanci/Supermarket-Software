@@ -18,6 +18,7 @@ import javafx.scene.text.Font;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import resources.ResourceManager;
 
 public class Notification implements Serializable{
 	
@@ -50,7 +51,8 @@ public class Notification implements Serializable{
 		alertIV.setFitHeight(70);
 		alertIV.setFitWidth(70);
 		alertIV.setPreserveRatio(true);
-		alertIV.setImage(new Image("resources" + File.separator + "alert.png"));
+		//alertIV.setImage(new Image("resources" + File.separator + "alert.png"));
+		alertIV.setImage(new Image(ResourceManager.alertloc.toString()));
 		
 		TextArea msgArea = new TextArea();
 		msgArea.setText(this.getMessage());
