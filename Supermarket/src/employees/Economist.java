@@ -15,7 +15,7 @@ public class Economist extends User implements IChecker, Serializable {
 
 	@Override
 	public boolean check(String user, String pw) {
-		return (user.equals(this.getName()) && pw.equals(this.getPassword())) ? true : false;
+		return (user.equals(this.getUsername()) && pw.equals(this.getPassword())) ? true : false;
 	}
 
 }
