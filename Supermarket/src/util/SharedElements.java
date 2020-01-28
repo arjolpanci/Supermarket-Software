@@ -23,11 +23,8 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
-import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
-import javafx.scene.chart.XYChart.Data;
-import javafx.scene.chart.XYChart.Series;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
@@ -1089,7 +1086,7 @@ public class SharedElements {
 					ArrayList<Integer> existingMonths = new ArrayList<Integer>();
 					for(FinancialAction fa : sm.getFinances()) {
 						if(fa.getDate().isBetween(from, to)) {
-							if(!existingMonths.contains(fa.getDate().getMonth())) {
+							if(!existingMonths.contains(fa.getDate().getMonth()) || existingMonths.isEmpty()) {
 								XYChart.Series ds = new XYChart.Series();
 								String mnth = fa.getDate().toLocalDate().getMonth().toString() + " " + fa.getDate().getYear();
 								Float data = sm.getTotalForMonth(fa.getDate().getMonth(), fa.getDate().getYear());

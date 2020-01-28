@@ -1,6 +1,8 @@
 package application;
 
+import java.awt.Desktop;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import data.ProductIO;
@@ -20,6 +22,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -32,6 +35,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import products.Product;
 import resources.ResourceManager;
@@ -56,6 +60,7 @@ public class AdminStage {
 		Stage adminStage = new Stage();
 		adminStage.getIcons().add(SharedElements.getIcon().getImage());
 		ScrollPane mainPane = new ScrollPane();
+		mainPane.setStyle("-fx-background-color: #032030");
 		BorderPane mainWindow = new BorderPane();
 		mainWindow.setCenter(mainPane);
 		ToolBar topBar = new ToolBar();
@@ -320,7 +325,60 @@ public class AdminStage {
 			}
 		});
 		
+		
+		//Menu Stuff
 		MenuBar menu = new MenuBar();
+		Menu file = new Menu("File");
+		MenuItem openFiles = new MenuItem("Data Files");
+		openFiles.setOnAction(e -> {
+			try {
+				Desktop.getDesktop().open(new File("files"));
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+		});
+		
+		MenuItem refresh = new MenuItem("Refresh");
+		refresh.setOnAction(e -> {
+			adminStage.close();
+			AdminStage as = new AdminStage();
+			as.view(previousStage, adm);
+		});
+		
+		MenuItem quit = new MenuItem("Exit");
+		quit.setOnAction(e -> {
+			adminStage.close();
+		});
+		
+		file.getItems().addAll(openFiles, refresh, quit);
+		
+		Menu help = new Menu("Help");
+		MenuItem about = new MenuItem("About");
+		about.setOnAction(e -> {
+			Stage aboutstg = new Stage();
+			VBox layout = new VBox(10);
+			layout.setStyle("-fx-background-color: #074F76");
+			layout.setAlignment(Pos.CENTER);
+			
+			Label txt = new Label("This application has been developed");
+			txt.setStyle("-fx-text-fill: White");
+			txt.setFont(new Font(16));
+			Label txt2 = new Label("by Arjol Panci as a University");
+			txt2.setStyle("-fx-text-fill: White");
+			txt2.setFont(new Font(16));
+			Label txt3 = new Label("project using Java / JavaFX.");
+			txt3.setStyle("-fx-text-fill: White");
+			txt3.setFont(new Font(16));
+			layout.getChildren().addAll(SharedElements.getIcon(), txt, txt2, txt3);
+			
+			Scene aboutsc = new Scene(layout, 300, 300);
+			aboutstg.setTitle("About");
+			aboutstg.getIcons().add(SharedElements.getIcon().getImage());
+			aboutstg.setScene(aboutsc);
+			aboutstg.show();
+		});
+		help.getItems().add(about);
+		
 		Menu logOut = new Menu();
 		Label logOutLabel = new Label("Log Out");
 		logOutLabel.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -332,12 +390,13 @@ public class AdminStage {
 			}
 		});
 		logOut.setGraphic(logOutLabel);
-		menu.getMenus().add(logOut);
+		menu.getMenus().addAll(file, help, logOut);
+		
 		
 		topBar.getItems().addAll(usersButton, productsButton, incomeButton, notificationButton, logOutButton);
 		VBox top = new VBox(menu, topBar);
 		mainWindow.setTop(top);
-		Scene adminScene = new Scene(mainWindow, 1024, 576);
+		Scene adminScene = new Scene(mainWindow, 1152, 648);
 		adminScene.getStylesheets().add("style.css");
 		adminStage.setTitle("Admin Window ( " + adm.getName() + " )");
 		adminStage.setScene(adminScene);

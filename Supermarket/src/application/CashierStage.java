@@ -16,6 +16,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TableColumn;
@@ -83,9 +84,12 @@ public class CashierStage {
 		TextField searchTextField = new TextField();
 		searchTextField.getStyleClass().add("textfield");
 		searchTextField.setPromptText("Search ...");
+		ChoiceBox<String> cb = new ChoiceBox<String>();
+		cb.getItems().add("Name");
+		cb.getItems().add("Barcode");
 		HBox searchArea = new HBox(15);
 		searchArea.setAlignment(Pos.CENTER);
-		searchArea.getChildren().addAll(searchImgView, searchTextField);
+		searchArea.getChildren().addAll(searchImgView, searchTextField, cb);
 		
 		HBox cashRegToolBar = new HBox(100);
 		cashRegToolBar.setAlignment(Pos.CENTER);
@@ -158,11 +162,20 @@ public class CashierStage {
 				refresh(pio);
 				productsView.setCenter(productData);
 			}else {
+				String choice = cb.getSelectionModel().getSelectedItem();
+				if(choice == null) return;
 				products.clear();
 				for(Product p : pio.getProducts()) {
-					if(p.getName().contains(newValue)) {
-						products.add(p);
-						productsView.setCenter(productData);
+					if(choice.equals("Barcode")) {
+						if(String.valueOf(p.getBarcode()).contains(newValue)) {
+							products.add(p);
+							productsView.setCenter(productData);
+						}
+					}else if(choice.equals("Name")) {
+						if(p.getName().contains(newValue)) {
+							products.add(p);
+							productsView.setCenter(productData);
+						}
 					}
 				}
 				productData.setItems(products);
@@ -311,16 +324,6 @@ public class CashierStage {
 						pio.reAdd(p);
 					}
 					Product pr = billData.getSelectionModel().getSelectedItem();
-					/**saved.clear();
-					ArrayList<Product> tmp = new ArrayList<Product>();					
-					for(Product p : saved) {
-						if(p.getName().equals(pr)) {
-							tmp.add(p);
-						}
-					}
-					for(Product p : tmp) {
-						saved.remove(p);
-					}*/
 					billproducts.remove(pr);
 					refresh();
 					products.clear();
@@ -341,7 +344,7 @@ public class CashierStage {
 		cashRegView.getItems().addAll(productsView, billView);
 		topBar.getItems().addAll(cashRegisterButton, logOutButton);
 		
-		Scene cashierScene = new Scene(mainWindow, 1024, 576);
+		Scene cashierScene = new Scene(mainWindow, 1152, 648);
 		cashierScene.getStylesheets().add("style.css");
 		cashierStage.setTitle("Cashier Window " + " ( " + cashier.getName() + " )");
 		cashierStage.setScene(cashierScene);
