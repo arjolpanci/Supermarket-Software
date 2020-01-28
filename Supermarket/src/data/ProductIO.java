@@ -63,7 +63,7 @@ public class ProductIO {
 		return null;
 	}
 	
-	public void addProduct(Product product, boolean isfinancial) {
+	public int addProduct(Product product, boolean isfinancial) {
 		boolean flag = true;
 		for(Product p : products) {
 			if(product.equals(p) || product.getName().equals(p.getName()) || product.getSupplier().equals(p.getSupplier())) {
@@ -73,7 +73,7 @@ public class ProductIO {
 						FinancialAction fa = new FinancialAction(product, product.getBuyingprice() * product.getQuantity() * -1);
 						sm.addFinancialAction(fa);	
 					}
-					return;
+					return 0;
 				}
 				int qntybought = product.getQuantity() - p.getQuantity();
 				if(isfinancial) {
@@ -86,15 +86,19 @@ public class ProductIO {
 				products.remove(p);
 				p.setQuantity(product.getQuantity());
 				p.setPrice(product.getPrice());
-				//Alert al = new Alert(AlertType.INFORMATION, "That product was already on stock, "
-				//		+ "only quantity\\price has been changed", ButtonType.OK);
-				//al.show();
 				products.add(p);
 				write();
 				flag = false;
 			}
 		}
 		if(flag) {
+			for(Product p : products) {
+				if(product.getBarcode() == p.getBarcode()) {
+					Alert al = new Alert(AlertType.ERROR, "A product with that barcode already exists", ButtonType.OK);
+					al.showAndWait();
+					return 0;
+				}
+			}
 			products.add(product);
 			if(isfinancial) {
 				FinancialAction fa = new FinancialAction(product, product.getBuyingprice() * product.getQuantity() * -1);
@@ -102,6 +106,7 @@ public class ProductIO {
 			}
 			write();
 		}
+		return 1;
 	}
 	
 	public void update() { write(); }

@@ -64,14 +64,14 @@ public class SharedElements {
 		editUserStage.getIcons().add(SharedElements.getIcon().getImage());
 		editUserStage.initModality(Modality.APPLICATION_MODAL);
 		
-		TextField editNameTField = new TextField();
+		TextOnlyField editNameTField = new TextOnlyField();
 		editNameTField.setText(user.getName());
 		Label nameLabel = new Label("First Name: \t");
 		HBox nameArea = new HBox(10);
 		nameArea.setAlignment(Pos.CENTER);
 		nameArea.getChildren().addAll(nameLabel, editNameTField);
 		
-		TextField editSurnameTField = new TextField();
+		TextOnlyField editSurnameTField = new TextOnlyField();
 		editSurnameTField.setText(user.getSurname());
 		Label surnameLabel = new Label("Last Name: \t");
 		HBox surnameArea = new HBox(10);
@@ -80,12 +80,14 @@ public class SharedElements {
 		
 		TextField editUsernameTField = new TextField();
 		editUsernameTField.setText(user.getUsername());
+		editUsernameTField.getStyleClass().add("textfield");
 		Label usernameLabel = new Label("Username: \t");
 		HBox usernameArea = new HBox(10);
 		usernameArea.setAlignment(Pos.CENTER);
 		usernameArea.getChildren().addAll(usernameLabel, editUsernameTField);
 		
 		TextField editPasswordTField = new TextField();
+		editPasswordTField.getStyleClass().add("textfield");
 		editPasswordTField.setText(user.getPassword());
 		Label passwordLabel = new Label("Password: \t");
 		HBox passwordArea = new HBox(10);
@@ -161,7 +163,8 @@ public class SharedElements {
 		VBox layout = new VBox(20);
 		layout.setAlignment(Pos.CENTER);
 		layout.getChildren().addAll(SharedElements.getHeader("Edit User: " + user.getName(), 0, 70), nameArea, surnameArea, usernameArea, passwordArea, birthdayArea, buttonArea);
-
+		layout.getStylesheets().add("style.css");
+		
 		Scene editUserScene = new Scene(layout, 450, 360);
 		editUserStage.setTitle("Edit User");
 		editUserStage.setResizable(false);
@@ -402,7 +405,7 @@ public class SharedElements {
 		supplierArea.setAlignment(Pos.CENTER);
 		supplierArea.getChildren().addAll(supplierLabel, supplierTField);
 		
-		TextField quantityTField = new TextField();
+		NumOnlyField quantityTField = new NumOnlyField();
 		quantityTField.getStyleClass().add("textfield");
 		quantityTField.setPrefWidth(200);
 		quantityTField.setPromptText("Enter Quantity ...");
@@ -411,7 +414,7 @@ public class SharedElements {
 		quantityArea.setAlignment(Pos.CENTER);
 		quantityArea.getChildren().addAll(quantityLabel, quantityTField);
 		
-		TextField buyingpriceTField = new TextField();
+		NumOnlyField buyingpriceTField = new NumOnlyField();
 		buyingpriceTField.getStyleClass().add("textfield");
 		buyingpriceTField.setPrefWidth(200);
 		buyingpriceTField.setPromptText("Enter Product Price ...");
@@ -420,7 +423,7 @@ public class SharedElements {
 		buyingpriceArea.setAlignment(Pos.CENTER);
 		buyingpriceArea.getChildren().addAll(buyingpriceLabel, buyingpriceTField);
 		
-		TextField priceTField = new TextField();
+		NumOnlyField priceTField = new NumOnlyField();
 		priceTField.getStyleClass().add("textfield");
 		priceTField.setPrefWidth(200);
 		priceTField.setPromptText("Enter Selling Price ...");
@@ -429,7 +432,7 @@ public class SharedElements {
 		priceArea.setAlignment(Pos.CENTER);
 		priceArea.getChildren().addAll(priceLabel, priceTField);
 
-		TextField barcodeTField = new TextField();
+		NumOnlyField barcodeTField = new NumOnlyField();
 		barcodeTField.getStyleClass().add("textfield");
 		barcodeTField.setPrefWidth(200);
 		barcodeTField.setPromptText("Enter Barcode ...");
@@ -456,28 +459,37 @@ public class SharedElements {
 			@Override
 			public void handle(ActionEvent event) {
 				try {
+					if(barcodeTField.getText().length() > 10 || barcodeTField.getText().length() < 10) {
+						Alert al = new Alert(AlertType.ERROR, "Barcode can't be bigger or smaller than 10 digits", ButtonType.OK);
+						al.setTitle("Error");
+						al.showAndWait();
+						return;
+					}
+					int flag = 1;
 					String name = nameTField.getText();
 					String supplier = supplierTField.getText();
 					int quantity = Integer.parseInt(quantityTField.getText());
 					float buyingprice = Float.parseFloat(buyingpriceTField.getText());
 					float price = Float.parseFloat(priceTField.getText());
 					int barcode = Integer.parseInt(barcodeTField.getText());
-					pio.addProduct(new Product(name, supplier, quantity, buyingprice, price, barcode, new SimpleDate(dateField.getValue())), true);
-					Alert al = new Alert(AlertType.INFORMATION, "Action performed succesfully", ButtonType.OK);
-					al.showAndWait();
-					nameTField.clear();
-					supplierTField.clear();
-					quantityTField.clear();
-					buyingpriceTField.clear();
-					priceTField.clear();
-					barcodeTField.clear();
-					dateField.setValue(null);
-					existingCBox.getItems().remove(1, existingCBox.getItems().size());
-					for(Product p : pio.getProducts()) {
-						existingCBox.getItems().add(p.getName());
+					flag = pio.addProduct(new Product(name, supplier, quantity, buyingprice, price, barcode, new SimpleDate(dateField.getValue())), true);
+					if(flag == 1) {
+						Alert al = new Alert(AlertType.INFORMATION, "Action performed succesfully", ButtonType.OK);
+						al.showAndWait();	
+						nameTField.clear();
+						supplierTField.clear();
+						quantityTField.clear();
+						buyingpriceTField.clear();
+						priceTField.clear();
+						barcodeTField.clear();
+						dateField.setValue(null);
+						existingCBox.getItems().remove(1, existingCBox.getItems().size());
+						for(Product p : pio.getProducts()) {
+							existingCBox.getItems().add(p.getName());
+						}
 					}
 				} catch (Exception ex) {
-					Alert al = new Alert(AlertType.ERROR, "Cannot Process Request", ButtonType.OK);
+					Alert al = new Alert(AlertType.ERROR, "One of the data has not been input correctly", ButtonType.OK);
 					al.setTitle("Error");
 					al.showAndWait();
 				}
@@ -505,6 +517,8 @@ public class SharedElements {
 					quantityTField.clear();
 					priceTField.setDisable(false);
 					priceTField.clear();
+					buyingpriceTField.setDisable(false);
+					buyingpriceTField.clear();
 					barcodeTField.setDisable(false);
 					barcodeTField.clear();
 					dateField.setDisable(false);
@@ -541,7 +555,7 @@ public class SharedElements {
 		editProductStage.getIcons().add(SharedElements.getIcon().getImage());
 		editProductStage.setResizable(false);
 		Label quantityLabel = new Label("Change Quantity: ");
-		TextField qtyTField = new TextField();
+		NumOnlyField qtyTField = new NumOnlyField();
 		qtyTField.setText("" + p.getQuantity());
 		qtyTField.getStyleClass().add("textfield");
 		HBox quantityArea = new HBox(15);
@@ -549,7 +563,7 @@ public class SharedElements {
 		quantityArea.getChildren().addAll(quantityLabel, qtyTField);
 		
 		Label priceLabel = new Label("Change Price: ");
-		TextField priceTField = new TextField();
+		NumOnlyField priceTField = new NumOnlyField();
 		priceTField.setText("" + p.getPrice());
 		priceTField.getStyleClass().add("textfield");
 		HBox priceArea = new HBox(15);
@@ -573,16 +587,24 @@ public class SharedElements {
 					al.showAndWait();
 				}else {
 					try {
+						int flag = 1;
+						int oldqty = p.getQuantity();
 						int newqty = Integer.parseInt(qtyTField.getText());
 						float newprice = Float.parseFloat(priceTField.getText());
 						pio.removeProduct(p);
 						p.setQuantity(newqty);
 						p.setPrice(newprice);
-						pio.addProduct(p, true);
+						if(newqty > oldqty) {
+							flag = pio.addProduct(p, true);	
+						}else {
+							flag = pio.addProduct(p, false);
+						}
 						pio.update();
-						Alert al = new Alert(AlertType.INFORMATION, "Action performed succesfully", ButtonType.OK);
-						al.setTitle("Information");
-						al.showAndWait();
+						if(flag == 1) {
+							Alert al = new Alert(AlertType.INFORMATION, "Action performed succesfully", ButtonType.OK);
+							al.setTitle("Information");
+							al.showAndWait();
+						}
 					} catch(Exception ex) {
 						Alert al = new Alert(AlertType.ERROR, "Cannot Process Request", ButtonType.OK);
 						al.setTitle("Error");

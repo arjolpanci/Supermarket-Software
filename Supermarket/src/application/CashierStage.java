@@ -1,6 +1,5 @@
 package application;
 
-import java.io.File;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
@@ -15,6 +14,7 @@ import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.SplitPane;
@@ -22,7 +22,6 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToolBar;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -35,6 +34,7 @@ import products.Product;
 import resources.ResourceManager;
 import util.FlatButton;
 import util.NotEnoughQuantityException;
+import util.NumOnlyField;
 import util.SharedElements;
 import util.SimpleDate;
 
@@ -105,22 +105,16 @@ public class CashierStage {
 
 		Label givenLabel = new Label("Given:   ");
 		givenLabel.setStyle("-fx-text-fill: White");
-		TextField givenTField = new TextField();
+		NumOnlyField givenTField = new NumOnlyField();
 		givenTField.getStyleClass().add("textfield");
 		givenTField.setPromptText("Given Money ...");
 		HBox givenArea = new HBox(20);
 		givenArea.setAlignment(Pos.CENTER);
 		givenArea.getChildren().addAll(givenLabel, givenTField);
 		
-		Label changeLabel = new Label("Change:");
+		Label changeLabel = new Label("Change: 0.0");
 		changeLabel.setStyle("-fx-text-fill: White");
-		TextField changeTField = new TextField();
-		changeTField.getStyleClass().add("textfield");
-		changeTField.setPromptText("Change ...");
-		changeTField.setDisable(true);
-		HBox changeArea = new HBox(20);
-		changeArea.setAlignment(Pos.CENTER);
-		changeArea.getChildren().addAll(changeLabel, changeTField);
+		changeLabel.setFont(new Font(16));
 		
 		FlatButton printButton = new FlatButton("Print");
 		FlatButton deleteButton = new FlatButton("Delete");
@@ -133,7 +127,7 @@ public class CashierStage {
 		billLayout.setPrefHeight(150);
 		billLayout.setAlignment(Pos.CENTER);
 		billLayout.setStyle("-fx-background-color: #074F76");
-		billLayout.getChildren().addAll(totalLabel, givenArea, changeArea, buttonArea);
+		billLayout.getChildren().addAll(totalLabel, givenArea, changeLabel, buttonArea);
 		billView.setBottom(billLayout);
 		
 		//Setting up button's images
@@ -173,6 +167,14 @@ public class CashierStage {
 				}
 				productData.setItems(products);
 			}
+		});
+		
+		givenTField.textProperty().addListener((observable, oldValue, newValue) -> {
+			float given = 0;
+			if(!newValue.equals("")) given = Float.parseFloat(newValue);
+			float change = given - total;
+			System.out.println(change);
+			changeLabel.setText("Change " + change);
 		});
 		
 		//Adding functions to buttons
