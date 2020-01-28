@@ -67,6 +67,14 @@ public class ProductIO {
 		boolean flag = true;
 		for(Product p : products) {
 			if(product.equals(p) || product.getName().equals(p.getName()) || product.getSupplier().equals(p.getSupplier())) {
+				if(!product.getExpireDate().equals(p.getExpireDate())) {
+					products.add(product);
+					if(isfinancial) {
+						FinancialAction fa = new FinancialAction(product, product.getBuyingprice() * product.getQuantity() * -1);
+						sm.addFinancialAction(fa);	
+					}
+					return;
+				}
 				int qntybought = product.getQuantity() - p.getQuantity();
 				if(isfinancial) {
 					Product faProduct = new Product(product.getName(), 
@@ -78,9 +86,9 @@ public class ProductIO {
 				products.remove(p);
 				p.setQuantity(product.getQuantity());
 				p.setPrice(product.getPrice());
-				Alert al = new Alert(AlertType.INFORMATION, "That product was already on stock, "
-						+ "only quantity\\price has been changed", ButtonType.OK);
-				al.show();
+				//Alert al = new Alert(AlertType.INFORMATION, "That product was already on stock, "
+				//		+ "only quantity\\price has been changed", ButtonType.OK);
+				//al.show();
 				products.add(p);
 				write();
 				flag = false;

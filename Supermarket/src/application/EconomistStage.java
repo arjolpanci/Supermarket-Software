@@ -13,6 +13,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -20,6 +21,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.ToolBar;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -108,14 +110,29 @@ public class EconomistStage {
 		logOutButton.setPrefSize(120, 85);
 		
 		FlatButton statsUserButton = new FlatButton("View Bills");
+		ImageView userSearchIV = SharedElements.getSearchIcon();
+		TextField userSearchField = new TextField();
+		userSearchField.getStyleClass().add("textfield");
+		userSearchField.setPromptText("Search ...");
+		HBox userSearchArea = new HBox(15);
+		userSearchArea.setAlignment(Pos.CENTER);
+		userSearchArea.getChildren().addAll(userSearchIV, userSearchField);
+		usersButtonTbar.getChildren().addAll(statsUserButton, userSearchArea);
 		
 		//Setting up buttons for Product View
 		FlatButton addProductButton = new FlatButton("Add Product");
 		FlatButton editProductButton = new FlatButton("Edit Product");
 		FlatButton removeProductButton = new FlatButton("Remove Product");
+		ImageView productSearchIV = SharedElements.getSearchIcon();
+		TextField productSearchField = new TextField();
+		productSearchField.getStyleClass().add("textfield");
+		productSearchField.setPromptText("Search ...");
+		HBox productSearchArea = new HBox(15);
+		productSearchArea.setAlignment(Pos.CENTER);
+		productSearchArea.getChildren().addAll(productSearchIV, productSearchField);
 		ToolBar productsTBar = new ToolBar();
 		productsTBar.setStyle("-fx-background-color: #074F76");
-		productsTBar.getItems().addAll(addProductButton, editProductButton, removeProductButton);
+		productsTBar.getItems().addAll(addProductButton, editProductButton, removeProductButton, productSearchArea);
 			
 		userData = viewUsers(uio);
 		productData = viewProducts(pio);
@@ -159,6 +176,39 @@ public class EconomistStage {
 				economistStage.close();
 				LoginStage lgs = new LoginStage();
 				lgs.view(economistStage, uio);
+			}
+		});
+		
+		//Search Field Events
+		productSearchField.textProperty().addListener((observable, oldValue, newValue) -> {
+			if(newValue.equals("")) {
+				refresh(pio);
+				mainPane.setContent(productData);
+			}else {
+				products.clear();
+				for(Product p : pio.getProducts()) {
+					if(p.getName().contains(newValue)) {
+						products.add(p);
+						mainPane.setContent(productData);
+					}
+				}
+				productData.setItems(products);
+			}
+		});
+		
+		userSearchField.textProperty().addListener((observable, oldValue, newValue) -> {
+			if(newValue.equals("")) {
+				refresh(uio);
+				mainPane.setContent(userData);
+			}else {
+				users.clear();
+				for(User u : uio.getUsers()) {
+					if(u.getName().contains(newValue)) {
+						users.add(u);
+						mainPane.setContent(userData);
+					}
+				}
+				userData.setItems(users);
 			}
 		});
 		
@@ -218,7 +268,6 @@ public class EconomistStage {
 			
 			
 		topBar.getItems().addAll(usersButton, productsButton, incomeButton, notificationButton, logOutButton);
-		usersButtonTbar.getChildren().addAll(statsUserButton);
 		mainWindow.setTop(topBar);
 		Scene economistScene = new Scene(mainWindow, 1024, 576);
 		economistScene.getStylesheets().add("style.css");

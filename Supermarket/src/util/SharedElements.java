@@ -2,8 +2,8 @@ package util;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.net.URL;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 import data.Bill;
@@ -21,6 +21,13 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.chart.BarChart;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
+import javafx.scene.chart.XYChart.Data;
+import javafx.scene.chart.XYChart.Series;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
@@ -28,6 +35,9 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
+import javafx.scene.control.TabPane.TabClosingPolicy;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
@@ -194,8 +204,7 @@ public class SharedElements {
 			choiceField.setDisable(true);
 		}
 		
-		TextField nameTField = new TextField();
-		nameTField.getStyleClass().add("textfield");
+		TextOnlyField nameTField = new TextOnlyField();
 		nameTField.setPrefWidth(200);
 		nameTField.setPromptText("Enter Name ...");
 		Label nameLabel = new Label("First Name: ");
@@ -203,8 +212,7 @@ public class SharedElements {
 		nameArea.setAlignment(Pos.CENTER);
 		nameArea.getChildren().addAll(nameLabel, nameTField);
 		
-		TextField surnameTField = new TextField();
-		surnameTField.getStyleClass().add("textfield");
+		TextOnlyField surnameTField = new TextOnlyField();
 		surnameTField.setPrefWidth(200);
 		surnameTField.setPromptText("Enter Surname ...");
 		Label surnameLabel = new Label("Last Name: ");
@@ -928,6 +936,7 @@ public class SharedElements {
 		mainWindow.setTop(SharedElements.getHeader("Financials", 0, 60));
 		
 		TableView<FinancialAction> tb = new TableView<FinancialAction>();
+		tb.setPrefSize(1620, 1024);
 		TableColumn<FinancialAction, String> column1 = new TableColumn<>("Date");
 		column1.setCellValueFactory(new PropertyValueFactory<>("date"));
 		TableColumn<FinancialAction, User> column2 = new TableColumn<>("Employee Salary");
@@ -937,6 +946,9 @@ public class SharedElements {
 		TableColumn<FinancialAction, Integer> column4 = new TableColumn<>("Amount");
 		column4.setCellValueFactory(new PropertyValueFactory<>("amount"));
 		tb.getColumns().addAll(column1, column2, column3, column4);
+		
+		ScrollPane allDataPane = new ScrollPane();
+		allDataPane.setContent(tb);
 		
 		float expenses = 0;
 		float income = 0;
@@ -948,9 +960,8 @@ public class SharedElements {
 			if(fa.getAmount() > 0) income += fa.getAmount();
 		}
 		
-		total = expenses + income;
+		total = expenses + income;	
 		
-		mainWindow.setCenter(tb);
 		
 		DatePicker startDate = new DatePicker();
 		Label fromLabel = new Label("From: ");
@@ -993,6 +1004,35 @@ public class SharedElements {
 
 		mainWindow.setBottom(bottom);
 		
+		
+        CategoryAxis xAxis = new CategoryAxis();
+        xAxis.setLabel("Month");
+        NumberAxis yAxis = new NumberAxis();
+        yAxis.setLabel("Net Income");
+        
+        BarChart<String, Number> barChart = new BarChart<String, Number>(xAxis, yAxis); 
+        XYChart.Series<String, Number> dataSeries = new XYChart.Series<String, Number>();
+        dataSeries.setName("Income for month");
+        
+        ScrollPane spane = new ScrollPane();
+        spane.setContent(barChart);
+        barChart.setPrefWidth(2000);
+        barChart.setPrefHeight(600);
+        barChart.setMinWidth(2000);
+        Label placeHolder = new Label("Please fill-in the date fields to display the graph data");
+        placeHolder.setFont(new Font(30));
+        StackPane sp = new StackPane();
+        sp.setAlignment(Pos.CENTER);
+        sp.getChildren().addAll(spane, placeHolder);
+        
+		TabPane tp = new TabPane();
+		tp.setTabClosingPolicy(TabClosingPolicy.UNAVAILABLE);
+		tp.getTabs().add(new Tab("Total Data", allDataPane));
+		tp.getTabs().add(new Tab("Monthly Data", sp));
+		
+		mainWindow.setCenter(tp);
+        
+        
 		//Adding functions to buttons
 		refreshBtn.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
@@ -1020,6 +1060,24 @@ public class SharedElements {
 					expenseLabel.setText("Expenses: " + expenses + "$");
 					profitLabel.setText("Profit: " + income + "$");
 					netLabel.setText("Net Income: " + total + "$");
+					
+					dataSeries.getData().clear();
+					barChart.getData().clear();
+					
+					ArrayList<Integer> existingMonths = new ArrayList<Integer>();
+					for(FinancialAction fa : sm.getFinances()) {
+						if(fa.getDate().isBetween(from, to)) {
+							if(!existingMonths.contains(fa.getDate().getMonth())) {
+								XYChart.Series ds = new XYChart.Series();
+								String mnth = fa.getDate().toLocalDate().getMonth().toString() + " " + fa.getDate().getYear();
+								Float data = sm.getTotalForMonth(fa.getDate().getMonth(), fa.getDate().getYear());
+								ds.getData().add(new XYChart.Data(mnth, data));
+								barChart.getData().add(ds);
+								existingMonths.add(fa.getDate().getMonth());		
+							}
+						}
+					}
+					placeHolder.setVisible(false);
 				}catch(NullPointerException ex) {
 					Alert al = new Alert(AlertType.ERROR, "Please fill in the date fields", ButtonType.OK);
 					al.showAndWait();
@@ -1077,6 +1135,7 @@ public class SharedElements {
 		
 		
 		Scene saleScene = new Scene(mainWindow, 800, 500);
+		saleScene.getStylesheets().add("style.css");
 		saleStage.setScene(saleScene);
 		saleStage.showAndWait();
 	}
@@ -1086,7 +1145,6 @@ public class SharedElements {
 		logoImg.setFitWidth(150);
 		logoImg.setFitHeight(150);
 		logoImg.setPreserveRatio(true);
-		//logoImg.setImage(new Image("resources" + File.separator + "logo.png"));
 		logoImg.setImage(new Image(ResourceManager.logoloc.toString()));
 		return logoImg;
 	}
@@ -1096,7 +1154,6 @@ public class SharedElements {
 		searchImgView.setFitHeight(20);
 		searchImgView.setFitWidth(20);
 		searchImgView.setPreserveRatio(true);
-		//searchImgView.setImage(new Image("resources" + File.separator + "search.png"));
 		searchImgView.setImage(new Image(ResourceManager.searchloc.toString()));
 		return searchImgView;
 	}

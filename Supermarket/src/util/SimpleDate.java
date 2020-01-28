@@ -32,13 +32,13 @@ public class SimpleDate implements Serializable{
 		boolean flag = false;
 		LocalDate date = this.toLocalDate();
 		while(true) {
-			from = from.plusDays(1);
 			if(from.equals(date)) {
 				flag = true;
 				break;
 			}
 			if(from.getDayOfMonth() == to.getDayOfMonth() && from.getMonthValue() == to.getMonthValue() 
 					&& from.getYear() == to.getYear()) break;
+			from = from.plusDays(1);
 		}
 		return flag;
 	}

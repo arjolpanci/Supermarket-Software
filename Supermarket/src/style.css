@@ -36,3 +36,8 @@
     -fx-font-weight: bold;
     -fx-font-size: 14;
 }
+
+.tab-header-background
+{
+   -fx-background-color: -fx-outer-border, -fx-text-box-border, #074F76;
+}

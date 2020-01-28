@@ -1,6 +1,7 @@
 package application;
 
 import java.io.File;
+import java.time.LocalDate;
 import java.util.ArrayList;
 
 import data.Bill;
@@ -49,7 +50,6 @@ public class CashierStage {
 	public void view(Stage previousStage, Cashier cashier, UserIO uio) {
 		ProductIO pio = new ProductIO();
 
-
 		Stage cashierStage = new Stage();
 		cashierStage.getIcons().add(SharedElements.getIcon().getImage());
 		SplitPane cashRegView = new SplitPane();
@@ -62,7 +62,6 @@ public class CashierStage {
 		//Setting up the Cash Register View
 		BorderPane productsView = new BorderPane();
 		refresh(pio);
-		productData = viewProducts(pio);
 		productsView.setCenter(productData);
 		
 		ToolBar cashRegButtonArea = new ToolBar();
@@ -100,7 +99,7 @@ public class CashierStage {
 		billView.setCenter(billData);
 
 		Label totalLabel = new Label("Total: " + total);
-		totalLabel.setFont(new Font(16));
+		totalLabel.setFont(new Font(22));
 		totalLabel.setStyle("-fx-text-fill: White");
 
 		Label givenLabel = new Label("Given:   ");
@@ -136,7 +135,6 @@ public class CashierStage {
 		billLayout.getChildren().addAll(totalLabel, givenArea, changeArea, buttonArea);
 		billView.setBottom(billLayout);
 		
-		
 		//Setting up button's images
 		ImageView cashRegisterIV = new ImageView();
 		//Image cashRegisterImg = new Image("resources" + File.separator + "cashregister.png");
@@ -159,6 +157,23 @@ public class CashierStage {
 		FlatButton logOutButton = new FlatButton("Log Out", logoutIV);
 		logOutButton.setPrefSize(120, 85);
 		
+		searchTextField.textProperty().addListener((observable, oldValue, newValue) -> {
+			if(newValue.equals("")) {
+				products.clear();
+				refresh(pio);
+				productsView.setCenter(productData);
+			}else {
+				products.clear();
+				for(Product p : pio.getProducts()) {
+					if(p.getName().contains(newValue)) {
+						products.add(p);
+						productsView.setCenter(productData);
+					}
+				}
+				productData.setItems(products);
+			}
+		});
+		
 		//Adding functions to buttons
 		cashRegisterButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
@@ -170,6 +185,14 @@ public class CashierStage {
 		logOutButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
+				if(!billData.getItems().isEmpty()){
+					for(Product p : saved){
+						pio.reAdd(p);
+					}
+					saved.clear();
+					billproducts.clear();
+					products.clear();
+				}
 				cashierStage.close();
 				LoginStage lgs = new LoginStage();
 				lgs.view(cashierStage, uio);
@@ -183,27 +206,38 @@ public class CashierStage {
 					int qty = Integer.parseInt(quantityTextField.getText());
 					Product pr = productData.getSelectionModel().getSelectedItem();
 					
-					try {
-						saved.add((Product) pr.clone());
-					} catch (CloneNotSupportedException e) {
-						e.printStackTrace();
-					}
-					
 					boolean flag = false;
+					ArrayList<Product> tmp = new ArrayList<Product>();
+					ArrayList<Product> toAdd = new ArrayList<Product>();
 					for(Product p : billproducts) {
 						if(p.getName().equals(pr.getName())) {
 							pr.updateQuantity(qty, pio);
 							refresh(pio);
 							productsView.setCenter(productData);
 							int nqty = p.getQuantity() + qty;
-							billproducts.remove(p);
+							tmp.add(p);
 							Product newpr = new Product(pr.getName(), pr.getSupplier(), 
 									nqty, pr.getBuyingprice(), pr.getPriceForQuantity(nqty), pr.getBarcode(), new SimpleDate(pr.getExpireDate()));
-							billproducts.add(newpr);
+							toAdd.add(newpr);
 							refresh();
 							billView.setCenter(billData);
 							flag = true;
 						}
+					}
+					
+					if(!flag) {
+						try {
+							saved.add((Product) pr.clone());
+						} catch (CloneNotSupportedException e) {
+							e.printStackTrace();
+						}	
+					}
+					
+					for(Product p : tmp) {
+						billproducts.remove(p);
+					}
+					for(Product p : toAdd) {
+						billproducts.add(p);
 					}
 					if(!flag) {
 						pr.updateQuantity(qty, pio);
@@ -220,6 +254,7 @@ public class CashierStage {
 						total += p.getPrice();
 					}
 					totalLabel.setText("Total: " + total);
+					
 				}catch (NullPointerException ex) {
 					Alert al = new Alert(AlertType.ERROR, "Cannot process request", ButtonType.OK);
 					al.setTitle("Error");
@@ -253,12 +288,14 @@ public class CashierStage {
 					for(Product p : saved){
 						pio.reAdd(p);
 					}
+					saved.clear();
 					billproducts.clear();
 					products.clear();
 					refresh();
 					refresh(pio);
 					productData = viewProducts(pio);
 					productsView.setCenter(productData);
+					totalLabel.setText("Total: 0");
 				}
 			}
 		});
@@ -271,14 +308,28 @@ public class CashierStage {
 						pio.reAdd(p);
 					}
 					Product pr = billData.getSelectionModel().getSelectedItem();
+					/**saved.clear();
+					ArrayList<Product> tmp = new ArrayList<Product>();					
+					for(Product p : saved) {
+						if(p.getName().equals(pr)) {
+							tmp.add(p);
+						}
+					}
+					for(Product p : tmp) {
+						saved.remove(p);
+					}*/
 					billproducts.remove(pr);
 					refresh();
 					products.clear();
 					refresh(pio);
 					productData = viewProducts(pio);
 					productsView.setCenter(productData);
+					float total = 0;
+					for(Product p : billproducts) {
+						total += p.getPrice();
+					}
+					totalLabel.setText("Total: " + total);
 				}
-
 			}
 		});
 		
@@ -351,7 +402,7 @@ public class CashierStage {
 	private void refresh(ProductIO pio) {
 		products.clear();
 		for(Product p : pio.getProducts()) {
-			if(p.getQuantity() != 0) {
+			if(p.getQuantity() != 0 && p.getExpireDate().isAfter(LocalDate.now())) {
 				products.add(p);
 			}
 		}

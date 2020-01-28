@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.time.LocalDate;
 import java.util.ArrayList;
 
 public class SaleManager {
@@ -64,6 +65,16 @@ public class SaleManager {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public float getTotalForMonth(int month, int year) {
+		float total = 0;
+		for(FinancialAction fa : falist) {
+			if(fa.getDate().getMonth() == month && fa.getDate().getYear() == year) {
+				total += fa.getAmount();
+			}
+		}
+		return total;
 	}
 
 }
