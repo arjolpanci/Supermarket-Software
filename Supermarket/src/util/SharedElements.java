@@ -1146,6 +1146,7 @@ public class SharedElements {
 		logoImg.setFitHeight(150);
 		logoImg.setPreserveRatio(true);
 		logoImg.setImage(new Image(ResourceManager.logoloc.toString()));
+		logoImg.setSmooth(true);
 		return logoImg;
 	}
 	

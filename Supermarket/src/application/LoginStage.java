@@ -76,6 +76,7 @@ public class LoginStage {
 		userImg.setFitHeight(30);
 		userImg.setPreserveRatio(true);
 		userImg.setImage(new Image(ResourceManager.userloc.toString()));
+		userImg.setSmooth(true);
 		
 		TextField userTField = new TextField();
 		userTField.setPromptText("Username");
@@ -92,8 +93,8 @@ public class LoginStage {
 		pwImg.setFitWidth(30);
 		pwImg.setFitHeight(30);
 		pwImg.setPreserveRatio(true);
-		//pwImg.setImage(new Image("resources" + File.separator + "key.png"));
 		pwImg.setImage(new Image(ResourceManager.keyloc.toString()));
+		pwImg.setSmooth(true);
 		
 		PasswordField pwTField = new PasswordField();
 		pwTField.setPromptText("Password");

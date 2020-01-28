@@ -68,35 +68,35 @@ public class AdminStage {
 		usersbottomBar.getItems().add(usersButtonTbar);
 		
 		//Setting up the button's images for top toolbar
-		//ImageView userImg = new ImageView(new Image("resources" + File.separator + "man.png"));
 		ImageView userImg = new ImageView(new Image(ResourceManager.manloc.toString()));
 		userImg.setFitHeight(50);
 		userImg.setFitWidth(50);
 		userImg.setPreserveRatio(true);
+		userImg.setSmooth(true);
 		
-		//ImageView productsImg = new ImageView(new Image("resources" + File.separator + "cart.png"));
 		ImageView productsImg = new ImageView(new Image(ResourceManager.cartloc.toString()));
 		productsImg.setFitHeight(50);
 		productsImg.setFitWidth(50);
 		productsImg.setPreserveRatio(true);
+		productsImg.setSmooth(true);
 		
-		//ImageView incomeImg = new ImageView(new Image("resources" + File.separator + "money.png"));
 		ImageView incomeImg = new ImageView(new Image(ResourceManager.moneyloc.toString()));
 		incomeImg.setFitHeight(50);
 		incomeImg.setFitWidth(50);
 		incomeImg.setPreserveRatio(true);
+		incomeImg.setSmooth(true);
 		
-		//ImageView notifIV = new ImageView(new Image("resources" + File.separator + "notification.png"));
 		ImageView notifIV = new ImageView(new Image(ResourceManager.notificationloc.toString()));
 		notifIV.setFitHeight(50);
 		notifIV.setFitWidth(50);
 		notifIV.setPreserveRatio(true);
+		notifIV.setSmooth(true);
 		
-		//ImageView logoutIV = new ImageView(new Image("resources" + File.separator + "logout.png"));
 		ImageView logoutIV = new ImageView(new Image(ResourceManager.logoutloc.toString()));
 		logoutIV.setFitHeight(50);
 		logoutIV.setFitWidth(50);
 		logoutIV.setPreserveRatio(true);
+		logoutIV.setSmooth(true);
 		
 		
 		//Setting up the buttons for User View
@@ -116,6 +116,7 @@ public class AdminStage {
 		FlatButton removeUserButton = new FlatButton("Remove User");
 		FlatButton statsUserButton = new FlatButton("View Bills");
 		ImageView userSearchIV = SharedElements.getSearchIcon();
+		userSearchIV.setSmooth(true);
 		TextField userSearchField = new TextField();
 		userSearchField.getStyleClass().add("textfield");
 		userSearchField.setPromptText("Search ...");
@@ -130,6 +131,7 @@ public class AdminStage {
 		FlatButton editProductButton = new FlatButton("Edit Product");
 		FlatButton removeProductButton = new FlatButton("Remove Product");
 		ImageView productSearchIV = SharedElements.getSearchIcon();
+		productSearchIV.setSmooth(true);
 		TextField productSearchField = new TextField();
 		productSearchField.getStyleClass().add("textfield");
 		productSearchField.setPromptText("Search ...");

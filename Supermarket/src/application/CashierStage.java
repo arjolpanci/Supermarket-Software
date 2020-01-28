@@ -79,6 +79,7 @@ public class CashierStage {
 		quantityArea.getChildren().addAll(quantityLabel, quantityTextField, addToBillButton);
 
 		ImageView searchImgView = SharedElements.getSearchIcon();
+		searchImgView.setSmooth(true);
 		TextField searchTextField = new TextField();
 		searchTextField.getStyleClass().add("textfield");
 		searchTextField.setPromptText("Search ...");
@@ -137,19 +138,19 @@ public class CashierStage {
 		
 		//Setting up button's images
 		ImageView cashRegisterIV = new ImageView();
-		//Image cashRegisterImg = new Image("resources" + File.separator + "cashregister.png");
 		Image cashRegisterImg = new Image(ResourceManager.cashregisterloc.toString());
 		cashRegisterIV.setFitHeight(50);
 		cashRegisterIV.setFitWidth(50);
 		cashRegisterIV.setPreserveRatio(true);
 		cashRegisterIV.setImage(cashRegisterImg);
+		cashRegisterIV.setSmooth(true);
 
 		ImageView logoutIV = new ImageView();
 		logoutIV.setFitHeight(50);
 		logoutIV.setFitWidth(50);
 		logoutIV.setPreserveRatio(true);
-		//logoutIV.setImage(new Image("resources" + File.separator + "logout.png"));
 		logoutIV.setImage(new Image(ResourceManager.logoutloc.toString()));
+		logoutIV.setSmooth(true);
 		
 		//Setting up the main buttons
 		FlatButton cashRegisterButton = new FlatButton("Cash Register", cashRegisterIV);
