@@ -3,7 +3,6 @@ package util;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Scanner;
 
 import data.Bill;
@@ -33,6 +32,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -226,6 +226,7 @@ public class SharedElements {
 		surnameArea.getChildren().addAll(surnameLabel, surnameTField);
 		
 		TextField usernameTField = new TextField();
+		usernameTField.getStylesheets().add("style.css");
 		usernameTField.getStyleClass().add("textfield");
 		usernameTField.setPrefWidth(200);
 		usernameTField.setPromptText("Enter Username ...");
@@ -235,6 +236,7 @@ public class SharedElements {
 		usernameArea.getChildren().addAll(usernameLabel, usernameTField);
 		
 		TextField passwordTField = new TextField();
+		passwordTField.getStylesheets().add("style.css");
 		passwordTField.getStyleClass().add("textfield");
 		passwordTField.setPrefWidth(200);
 		passwordTField.setPromptText("Enter Password ...");
@@ -249,8 +251,7 @@ public class SharedElements {
 		birthdayArea.setAlignment(Pos.CENTER);
 		birthdayArea.getChildren().addAll(dateLabel, birthdayField);
 		
-		TextField salaryField = new TextField();
-		salaryField.getStyleClass().add("textfield");
+		NumOnlyField salaryField = new NumOnlyField();
 		salaryField.setPrefWidth(200);
 		salaryField.setPromptText("Enter Salary ...");
 		Label salaryLabel = new Label("Salary: ");
@@ -284,20 +285,17 @@ public class SharedElements {
 								uio.addUser(adm);
 								addUserStage.close();
 							}
-							uio.addUser(adm);
-							flag = true;
+							flag = uio.addUser(adm);
 							break;
 						case "Cashier":
 							Cashier csh = new Cashier(nameTField.getText(), surnameTField.getText(), usernameTField.getText(),
 									passwordTField.getText(), new SimpleDate(birthdayField.getValue()), Integer.parseInt(salaryField.getText()));
-							uio.addUser(csh);
-							flag = true;
+							flag = uio.addUser(csh);
 							break;
 						case "Economist":
 							Economist ec = new Economist(nameTField.getText(), surnameTField.getText(), usernameTField.getText(),
 									passwordTField.getText(), new SimpleDate(birthdayField.getValue()), Integer.parseInt(salaryField.getText()));
-							uio.addUser(ec);
-							flag = true;
+							flag = uio.addUser(ec);
 							break;
 						default:
 			               	Alert al = new Alert(AlertType.ERROR, "Cannot process request", ButtonType.OK);
@@ -349,7 +347,7 @@ public class SharedElements {
 		finalLayout.getChildren().addAll(SharedElements.getHeader("Add User", 0, 60), fullLayout);
 		Scene addUserScene = new Scene(finalLayout, 400,460);
 		
-		addUserScene.getStylesheets().add("style.css");
+		//addUserScene.getStylesheets().add("style.css");
 
 		addUserStage.setScene(addUserScene);
 		addUserStage.getIcons().add(SharedElements.getIcon().getImage());
@@ -357,6 +355,92 @@ public class SharedElements {
 		addUserStage.setTitle("Add User");
 		addUserStage.setResizable(false);
 		addUserStage.showAndWait();
+	}
+	
+	public static void addSupplierView(ProductIO pio) {
+		Stage addSupStage = new Stage();
+		addSupStage.setTitle("Add Supplier");
+		addSupStage.initModality(Modality.APPLICATION_MODAL);
+		addSupStage.getIcons().add(SharedElements.getIcon().getImage());
+		
+		Label supplier = new Label("Supplier");
+		TextField text = new TextField();
+		text.getStyleClass().add("textfield");
+		text.setPromptText("Enter Supplier Name ...");
+		HBox dataArea = new HBox(20);
+		dataArea.setAlignment(Pos.CENTER);
+		dataArea.getChildren().addAll(supplier, text);
+		FlatButton addBtn = new FlatButton("Add");
+		addBtn.setOnAction(e -> {
+			String txt = text.getText();
+			if(txt.equals("")) {
+				Alert al = new Alert(AlertType.ERROR, "Supplier name can't be empty", ButtonType.OK);
+				al.showAndWait();
+				return;
+			}else {
+				if(pio.addSupplier(txt) == 1) {
+				Alert al = new Alert(AlertType.INFORMATION, "Action performed succesfully", ButtonType.OK);
+				al.showAndWait();
+				}
+			}
+		});
+		
+		VBox layout = new VBox(15);
+		layout.setAlignment(Pos.CENTER);
+		layout.getChildren().addAll(SharedElements.getHeader("Add Supplier", 0, 60), dataArea, addBtn);
+		
+		Scene scene = new Scene(layout, 400, 160);
+		scene.getStylesheets().add("style.css");
+		addSupStage.setScene(scene);
+		addSupStage.showAndWait();
+	}
+	
+	public static void viewSuppliers(ProductIO pio) {
+		Stage viewSupStage = new Stage();
+		viewSupStage.setTitle("Suppliers");
+		viewSupStage.initModality(Modality.APPLICATION_MODAL);
+		viewSupStage.getIcons().add(SharedElements.getIcon().getImage());
+		ScrollPane sp = new ScrollPane();
+		
+		TableView<Product> tb = new TableView<Product>();
+		tb.setPrefWidth(450);
+		TableColumn<Product, String> c1 = new TableColumn<>("Supplier");
+		c1.setCellValueFactory(new PropertyValueFactory<>("supplier"));
+		tb.getColumns().add(c1);
+		
+		for(Product p : pio.getProducts()) {
+			if(p.getName().equals("RESERVED")) {
+				tb.getItems().add(p);
+			}
+		}
+		
+		FlatButton deleteBtn = new FlatButton("Delete");
+		deleteBtn.setOnAction(e -> {
+			try {
+				Product p = tb.getSelectionModel().getSelectedItem();
+				pio.deleteSupplier(p.getSupplier());
+				Alert al = new Alert(AlertType.INFORMATION, "Action Performed Succesfully", ButtonType.OK);
+				al.showAndWait();
+				tb.getItems().clear();
+				for(Product p2 : pio.getProducts()) {
+					if(p2.getName().equals("RESERVED")) tb.getItems().add(p2);
+				}
+			} catch (NullPointerException ex) {
+				Alert al = new Alert(AlertType.ERROR, "Please select an item", ButtonType.OK);
+				al.showAndWait();
+			}
+		});
+		
+		sp.setContent(tb);
+		
+		VBox layout = new VBox(15);
+		layout.setAlignment(Pos.CENTER);
+		layout.getChildren().addAll(SharedElements.getHeader("Suppliers", 0, 60), sp, deleteBtn);
+		
+		Scene scene = new Scene(layout, 400 , 530);
+		scene.getStylesheets().add("style.css");
+		viewSupStage.setScene(scene);
+		viewSupStage.showAndWait();
 	}
 	
 	public static void addProductView(Stage previousStage, ProductIO pio) {
@@ -381,7 +465,7 @@ public class SharedElements {
 		ChoiceBox<String> existingCBox = new ChoiceBox<String>();
 		existingCBox.getItems().add("New Product");
 		for(Product p : pio.getProducts()) {
-			existingCBox.getItems().add(p.getName());
+			if(!p.getName().equals("RESERVED")) existingCBox.getItems().add(p.getName());
 		}
 		existingCBox.setValue(existingCBox.getItems().get(0));
 		Label existingLabel = new Label("Existing Products: ");
@@ -390,6 +474,7 @@ public class SharedElements {
 		existingArea.getChildren().addAll(existingLabel, existingCBox);
 		
 		TextField nameTField = new TextField();
+		nameTField.getStylesheets().add("style.css");
 		nameTField.getStyleClass().add("textfield");
 		nameTField.setPrefWidth(200);
 		nameTField.setPromptText("Enter Name ...");
@@ -398,17 +483,20 @@ public class SharedElements {
 		nameArea.setAlignment(Pos.CENTER);
 		nameArea.getChildren().addAll(nameLabel, nameTField);
 		
-		TextField supplierTField = new TextField();
-		supplierTField.getStyleClass().add("textfield");
-		supplierTField.setPrefWidth(200);
-		supplierTField.setPromptText("Enter Supplier ...");
+		ComboBox<String> supplierField = new ComboBox<String>();
+		for(Product p : pio.getProducts()) {
+			if(p.getName().equals("RESERVED")) {
+				supplierField.getItems().add(p.getSupplier());
+			}
+		}
+		supplierField.setPrefWidth(200);
+		supplierField.setEditable(true);
 		Label supplierLabel = new Label("Supplier: ");
 		HBox supplierArea = new HBox(20);
 		supplierArea.setAlignment(Pos.CENTER);
-		supplierArea.getChildren().addAll(supplierLabel, supplierTField);
+		supplierArea.getChildren().addAll(supplierLabel, supplierField);
 		
 		NumOnlyField quantityTField = new NumOnlyField();
-		quantityTField.getStyleClass().add("textfield");
 		quantityTField.setPrefWidth(200);
 		quantityTField.setPromptText("Enter Quantity ...");
 		Label quantityLabel = new Label("Quantity: ");
@@ -417,7 +505,6 @@ public class SharedElements {
 		quantityArea.getChildren().addAll(quantityLabel, quantityTField);
 		
 		NumOnlyField buyingpriceTField = new NumOnlyField();
-		buyingpriceTField.getStyleClass().add("textfield");
 		buyingpriceTField.setPrefWidth(200);
 		buyingpriceTField.setPromptText("Enter Product Price ...");
 		Label buyingpriceLabel = new Label("Product Price: ");
@@ -426,7 +513,6 @@ public class SharedElements {
 		buyingpriceArea.getChildren().addAll(buyingpriceLabel, buyingpriceTField);
 		
 		NumOnlyField priceTField = new NumOnlyField();
-		priceTField.getStyleClass().add("textfield");
 		priceTField.setPrefWidth(200);
 		priceTField.setPromptText("Enter Selling Price ...");
 		Label priceLabel = new Label("Selling Price: ");
@@ -435,7 +521,6 @@ public class SharedElements {
 		priceArea.getChildren().addAll(priceLabel, priceTField);
 
 		NumOnlyField barcodeTField = new NumOnlyField();
-		barcodeTField.getStyleClass().add("textfield");
 		barcodeTField.setPrefWidth(200);
 		barcodeTField.setPromptText("Enter Barcode ...");
 		Label barcodeLabel = new Label("Barcode: ");
@@ -444,6 +529,7 @@ public class SharedElements {
 		barcodeArea.getChildren().addAll(barcodeLabel, barcodeTField);
 		
 		DatePicker dateField = new DatePicker();
+		dateField.setPrefWidth(200);
 		Label expireLabel = new Label("Expire Date: ");
 		HBox expireArea = new HBox(20);
 		expireArea.setAlignment(Pos.CENTER);
@@ -453,7 +539,6 @@ public class SharedElements {
 		fullLayout.getChildren().addAll(dataArea, buttonArea);
 		finalLayout.getChildren().addAll(SharedElements.getHeader("Add Product", 0, 60), fullLayout);
 		Scene addProductScene = new Scene(finalLayout, 400,520);
-		addProductScene.getStylesheets().add("style.css");
 		
 		
 		//Adding functions to buttons
@@ -469,17 +554,18 @@ public class SharedElements {
 					}
 					int flag = 1;
 					String name = nameTField.getText();
-					String supplier = supplierTField.getText();
+					String supplier = supplierField.getSelectionModel().getSelectedItem();
+					if(!pio.doesSupplierExist(supplier)) pio.addSupplier(supplier);
 					int quantity = Integer.parseInt(quantityTField.getText());
 					float buyingprice = Float.parseFloat(buyingpriceTField.getText());
 					float price = Float.parseFloat(priceTField.getText());
-					int barcode = Integer.parseInt(barcodeTField.getText());
+					long barcode = Long.parseLong(barcodeTField.getText());
 					flag = pio.addProduct(new Product(name, supplier, quantity, buyingprice, price, barcode, new SimpleDate(dateField.getValue())), true);
 					if(flag == 1) {
 						Alert al = new Alert(AlertType.INFORMATION, "Action performed succesfully", ButtonType.OK);
 						al.showAndWait();	
 						nameTField.clear();
-						supplierTField.clear();
+						supplierField.setValue("");
 						quantityTField.clear();
 						buyingpriceTField.clear();
 						priceTField.clear();
@@ -487,13 +573,14 @@ public class SharedElements {
 						dateField.setValue(null);
 						existingCBox.getItems().remove(1, existingCBox.getItems().size());
 						for(Product p : pio.getProducts()) {
-							existingCBox.getItems().add(p.getName());
+							if(!p.getName().equals("RESERVED")) existingCBox.getItems().add(p.getName());
 						}
 					}
 				} catch (Exception ex) {
 					Alert al = new Alert(AlertType.ERROR, "One of the data has not been input correctly", ButtonType.OK);
 					al.setTitle("Error");
 					al.showAndWait();
+					ex.printStackTrace();
 				}
 
 			}
@@ -513,8 +600,8 @@ public class SharedElements {
 				if(arg2.equals("New Product")) {
 					nameTField.setDisable(false);
 					nameTField.clear();
-					supplierTField.setDisable(false);
-					supplierTField.clear();
+					supplierField.setDisable(false);
+					supplierField.setValue("");
 					quantityTField.setDisable(false);
 					quantityTField.clear();
 					priceTField.setDisable(false);
@@ -529,8 +616,8 @@ public class SharedElements {
 					Product p = pio.getProductFromName(arg2);
 					nameTField.setDisable(true);
 					nameTField.setText(p.getName());
-					supplierTField.setDisable(true);
-					supplierTField.setText(p.getName());
+					supplierField.setDisable(true);
+					supplierField.setValue(p.getSupplier());
 					quantityTField.setText("" + p.getQuantity());
 					buyingpriceTField.setDisable(true);
 					buyingpriceTField.setText("" + p.getBuyingprice());

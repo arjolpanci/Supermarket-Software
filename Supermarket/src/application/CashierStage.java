@@ -1,5 +1,8 @@
 package application;
 
+import java.awt.Desktop;
+import java.io.File;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
@@ -18,6 +21,9 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -26,6 +32,7 @@ import javafx.scene.control.ToolBar;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -58,7 +65,8 @@ public class CashierStage {
 		ToolBar topBar = new ToolBar();
 		topBar.setPrefHeight(85);
 		topBar.setStyle("-fx-background-color: #074F76");
-		mainWindow.setTop(topBar);
+		VBox top = new VBox();
+		mainWindow.setTop(top);
 		
 		//Setting up the Cash Register View
 		BorderPane productsView = new BorderPane();
@@ -84,12 +92,9 @@ public class CashierStage {
 		TextField searchTextField = new TextField();
 		searchTextField.getStyleClass().add("textfield");
 		searchTextField.setPromptText("Search ...");
-		ChoiceBox<String> cb = new ChoiceBox<String>();
-		cb.getItems().add("Name");
-		cb.getItems().add("Barcode");
 		HBox searchArea = new HBox(15);
 		searchArea.setAlignment(Pos.CENTER);
-		searchArea.getChildren().addAll(searchImgView, searchTextField, cb);
+		searchArea.getChildren().addAll(searchImgView, searchTextField);
 		
 		HBox cashRegToolBar = new HBox(100);
 		cashRegToolBar.setAlignment(Pos.CENTER);
@@ -162,17 +167,11 @@ public class CashierStage {
 				refresh(pio);
 				productsView.setCenter(productData);
 			}else {
-				String choice = cb.getSelectionModel().getSelectedItem();
-				if(choice == null) return;
 				products.clear();
 				for(Product p : pio.getProducts()) {
-					if(choice.equals("Barcode")) {
-						if(String.valueOf(p.getBarcode()).contains(newValue)) {
-							products.add(p);
-							productsView.setCenter(productData);
-						}
-					}else if(choice.equals("Name")) {
-						if(p.getName().contains(newValue)) {
+					if(p.getName().contains(newValue) || p.getSupplier().contains(newValue) 
+							|| String.valueOf(p.getBarcode()).contains(newValue)) {
+						if(!p.getName().equals("RESERVED")){
 							products.add(p);
 							productsView.setCenter(productData);
 						}
@@ -186,7 +185,6 @@ public class CashierStage {
 			float given = 0;
 			if(!newValue.equals("")) given = Float.parseFloat(newValue);
 			float change = given - total;
-			System.out.println(change);
 			changeLabel.setText("Change " + change);
 		});
 		
@@ -276,6 +274,7 @@ public class CashierStage {
 					al.setTitle("Error");
 					al.showAndWait();
 				} catch (NotEnoughQuantityException e) {
+					System.out.println("------------Data for Developer------------");
 					e.printStackTrace();
 				}
 			}
@@ -339,10 +338,68 @@ public class CashierStage {
 			}
 		});
 		
+		//Menu Stuff
+		MenuBar menu = new MenuBar();
+		Menu file = new Menu("File");
+		
+		MenuItem refresh = new MenuItem("Refresh");
+		refresh.setOnAction(e -> {
+			cashierStage.close();
+			CashierStage cs = new CashierStage();
+			cs.view(previousStage, cashier, uio);
+		});
+		
+		MenuItem quit = new MenuItem("Exit");
+		quit.setOnAction(e -> {
+			cashierStage.close();
+		});
+		
+		file.getItems().addAll(refresh, quit);
+		
+		Menu help = new Menu("Help");
+		MenuItem about = new MenuItem("About");
+		about.setOnAction(e -> {
+			Stage aboutstg = new Stage();
+			VBox layout = new VBox(10);
+			layout.setStyle("-fx-background-color: #074F76");
+			layout.setAlignment(Pos.CENTER);
+			
+			Label txt = new Label("This application has been developed");
+			txt.setStyle("-fx-text-fill: White");
+			txt.setFont(new Font(16));
+			Label txt2 = new Label("by Arjol Panci as a University");
+			txt2.setStyle("-fx-text-fill: White");
+			txt2.setFont(new Font(16));
+			Label txt3 = new Label("project using Java / JavaFX.");
+			txt3.setStyle("-fx-text-fill: White");
+			txt3.setFont(new Font(16));
+			layout.getChildren().addAll(SharedElements.getIcon(), txt, txt2, txt3);
+			
+			Scene aboutsc = new Scene(layout, 300, 300);
+			aboutstg.setTitle("About");
+			aboutstg.getIcons().add(SharedElements.getIcon().getImage());
+			aboutstg.setScene(aboutsc);
+			aboutstg.show();
+		});
+		help.getItems().add(about);
+		
+		Menu logOut = new Menu();
+		Label logOutLabel = new Label("Log Out");
+		logOutLabel.setOnMouseClicked(new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent event) {
+				cashierStage.close();
+				LoginStage lgs = new LoginStage();
+				lgs.view(previousStage, uio);
+			}
+		});
+		logOut.setGraphic(logOutLabel);
+		menu.getMenus().addAll(file, help, logOut);
 		
 		//Finishing the Layout
 		cashRegView.getItems().addAll(productsView, billView);
 		topBar.getItems().addAll(cashRegisterButton, logOutButton);
+		top.getChildren().addAll(menu, topBar);
 		
 		Scene cashierScene = new Scene(mainWindow, 1152, 648);
 		cashierScene.getStylesheets().add("style.css");
@@ -409,7 +466,7 @@ public class CashierStage {
 		products.clear();
 		for(Product p : pio.getProducts()) {
 			if(p.getQuantity() != 0 && p.getExpireDate().isAfter(LocalDate.now())) {
-				products.add(p);
+				if(!(p.getName().equals("RESERVED"))) products.add(p);
 			}
 		}
 		productData = viewProducts(pio);

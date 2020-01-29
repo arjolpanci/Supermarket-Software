@@ -14,10 +14,10 @@ public class Product implements Serializable, Cloneable{
 	private int quantity;
 	private float buyingprice;
 	private float price;
-	private int barcode;
+	private long barcode;
 	private LocalDate expireDate;
 	
-	public Product(String name, String supplier, int quantity, float buyingprice, float price, int barcode, SimpleDate expire) {
+	public Product(String name, String supplier, int quantity, float buyingprice, float price, long barcode, SimpleDate expire) {
 		this.name = name;
 		this.supplier = supplier;
 		this.quantity = quantity;
@@ -28,7 +28,7 @@ public class Product implements Serializable, Cloneable{
 	}
 	
 	public void updateQuantity(int qty, ProductIO pio) throws NotEnoughQuantityException{
-		if(qty > quantity || qty < 0) throw new NotEnoughQuantityException(qty);
+		if(qty > quantity || qty <= 0) throw new NotEnoughQuantityException(qty);
 		pio.removeProduct(this);
 		quantity -= qty;
 		pio.addProduct(this, false);
@@ -60,8 +60,8 @@ public class Product implements Serializable, Cloneable{
 	public float getPrice() { return price; }
 	public void setPrice(float price) { this.price = price; }
 
-	public int getBarcode() { return barcode; }
-	public void setBarcode(int barcode) { this.barcode = barcode; }
+	public long getBarcode() { return barcode; }
+	public void setBarcode(long barcode) { this.barcode = barcode; }
 	
 	public LocalDate getExpireDate() { return expireDate; }
 	public void setExpireDate(SimpleDate expireDate) { this.expireDate = expireDate.toLocalDate(); }

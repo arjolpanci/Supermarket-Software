@@ -1,6 +1,5 @@
 package application;
 
-import java.io.File;
 
 import data.ProductIO;
 import data.UserIO;
@@ -17,7 +16,6 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.PasswordField;
-import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -27,7 +25,6 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 import products.Product;
 import resources.ResourceManager;
 import util.FlatButton;
@@ -44,13 +41,13 @@ public class LoginStage {
 		ProductIO pio = new ProductIO();
 		
 		for(Product p : pio.getProducts()) {
-			if(p.hasExpired()) {
+			if(p.hasExpired() && !(p.getName().equals("RESERVED"))) {
 				Notification na = new Notification("Application", "Administrator", p.getName() + " has expired");
 				Notification ne = new Notification("Application", "Economist", p.getName() + " has expired");
 				if(!nm.exits(na)) nm.addNotification(na);
 				if(!nm.exits(ne))nm.addNotification(ne);
 			}
-			if(p.getQuantity() <= 5) {
+			if(p.getQuantity() <= 5 && !(p.getName().equals("RESERVED"))) {
 				Notification na = new Notification("Application", "Administrator", p.getName() + " is close to running out");
 				Notification ne = new Notification("Application", "Economist", p.getName() + " is close to running out");
 				if(!nm.exits(na)) nm.addNotification(na);

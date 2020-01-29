@@ -56,21 +56,22 @@ public class UserIO {
 		return cnt;
 	}
 	
-	public void addUser(User user) {
+	public boolean addUser(User user) {
 		for(User u : users) {
 			if(user.equals(u)) {
 				Alert al = new Alert(AlertType.ERROR, "The user with the given information already exists", ButtonType.OK);
 				al.show();
-				return;
+				return false;
 			}else if(user.getUsername().equals(u.getUsername())) {
 				Alert al = new Alert(AlertType.ERROR, "The user with the given username already exists", ButtonType.OK);
 				al.show();
-				return;
+				return false;
 			}
 		}
 		user.setId(getId());
 		users.add(user);
 		write();
+		return true;
 	}
 	
 	public void removeUser(User user) {

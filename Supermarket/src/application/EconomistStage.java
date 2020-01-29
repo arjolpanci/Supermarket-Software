@@ -129,6 +129,8 @@ public class EconomistStage {
 		
 		//Setting up buttons for Product View
 		FlatButton addProductButton = new FlatButton("Add Product");
+		FlatButton addSupplierButton = new FlatButton("Add Supplier");
+		FlatButton viewSupplierButton = new FlatButton("View Suppliers");
 		FlatButton editProductButton = new FlatButton("Edit Product");
 		FlatButton removeProductButton = new FlatButton("Remove Product");
 		ImageView productSearchIV = SharedElements.getSearchIcon();
@@ -141,7 +143,7 @@ public class EconomistStage {
 		productSearchArea.getChildren().addAll(productSearchIV, productSearchField);
 		ToolBar productsTBar = new ToolBar();
 		productsTBar.setStyle("-fx-background-color: #074F76");
-		productsTBar.getItems().addAll(addProductButton, editProductButton, removeProductButton, productSearchArea);
+		productsTBar.getItems().addAll(addProductButton, addSupplierButton, viewSupplierButton, editProductButton, removeProductButton, productSearchArea);
 			
 		userData = viewUsers(uio);
 		productData = viewProducts(pio);
@@ -196,8 +198,9 @@ public class EconomistStage {
 			}else {
 				products.clear();
 				for(Product p : pio.getProducts()) {
-					if(p.getName().contains(newValue)) {
-						products.add(p);
+					if(p.getName().contains(newValue) || p.getSupplier().contains(newValue) 
+							|| String.valueOf(p.getBarcode()).contains(newValue)) {
+						if(!(p.getName().equals("RESERVED"))) products.add(p);
 						mainPane.setContent(productData);
 					}
 				}
@@ -226,6 +229,24 @@ public class EconomistStage {
 			@Override
 			public void handle(ActionEvent arg0) {
 				SharedElements.addProductView(economistStage, pio);
+				refresh(pio);
+				mainPane.setContent(productData);
+			}
+		});
+		
+		addSupplierButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent arg0) {
+				SharedElements.addSupplierView(pio);
+				refresh(pio);
+				mainPane.setContent(productData);
+			}
+		});
+		
+		viewSupplierButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent arg0) {
+				SharedElements.viewSuppliers(pio);
 				refresh(pio);
 				mainPane.setContent(productData);
 			}
@@ -449,7 +470,7 @@ public class EconomistStage {
 	private void refresh(ProductIO pio) {
 		products.clear();
 		for(Product p : pio.getProducts()) {
-			products.add(p);
+			if(!p.getName().equals("RESERVED")) products.add(p);
 		}
 		productData = viewProducts(pio);
 	}
