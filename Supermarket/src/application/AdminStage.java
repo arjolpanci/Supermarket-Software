@@ -48,8 +48,8 @@ public class AdminStage {
 	
 	private ObservableList<User> users = FXCollections.observableArrayList();
 	private ObservableList<Product> products = FXCollections.observableArrayList();
-	private TableView userData;
-	private TableView productData;
+	private TableView<User> userData;
+	private TableView<Product> productData;
 	
 	public void view(Stage previousStage, Admin adm) {
 		UserIO uio = new UserIO();
@@ -436,9 +436,9 @@ public class AdminStage {
 		}
 	}
 	
-	private TableView viewUsers(UserIO uio) {
+	private TableView<User> viewUsers(UserIO uio) {
 		
-		TableView usersTable = new TableView();
+		TableView<User> usersTable = new TableView<User>();
 		TableColumn<User, Integer> column1 = new TableColumn<>("Id");
         column1.setCellValueFactory(new PropertyValueFactory<>("id"));
         
@@ -473,9 +473,9 @@ public class AdminStage {
 		
 	}
 	
-	private TableView viewProducts(ProductIO uio) {
+	private TableView<Product> viewProducts(ProductIO uio) {
 	
-		TableView productsTable = new TableView();
+		TableView<Product> productsTable = new TableView<Product>();
 		TableColumn<Product, String> column1 = new TableColumn<>("Name");
 		column1.setCellValueFactory(new PropertyValueFactory<>("name"));
 		

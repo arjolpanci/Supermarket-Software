@@ -3,7 +3,6 @@ package data;
 import java.io.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.UUID;
 
 import employees.Cashier;
 import javafx.scene.control.Alert;

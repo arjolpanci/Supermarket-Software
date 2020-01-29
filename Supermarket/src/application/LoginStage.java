@@ -1,7 +1,11 @@
 package application;
 
 
+import java.time.LocalDate;
+
+import data.FinancialAction;
 import data.ProductIO;
+import data.SaleManager;
 import data.UserIO;
 import employees.Admin;
 import employees.Cashier;
@@ -36,9 +40,11 @@ import util.SharedElements;
 public class LoginStage {
 	
 	public void view(Stage previousStage, UserIO uio) {
+		LocalDate date = LocalDate.now();
 		Stage loginStage = new Stage();
 		NotificationManager nm = new NotificationManager();
 		ProductIO pio = new ProductIO();
+		SaleManager sm = new SaleManager();
 		
 		for(Product p : pio.getProducts()) {
 			if(p.hasExpired() && !(p.getName().equals("RESERVED"))) {
@@ -52,6 +58,19 @@ public class LoginStage {
 				Notification ne = new Notification("Application", "Economist", p.getName() + " is close to running out");
 				if(!nm.exits(na)) nm.addNotification(na);
 				if(!nm.exits(ne))nm.addNotification(ne);
+			}
+		}
+		
+		if(date.getDayOfMonth() == 1) {
+			for(User u : uio.getUsers()) {
+				if(!(u instanceof Admin)) {
+					FinancialAction fa = new FinancialAction(u, u.getSalary() * -1);
+					sm.addFinancialAction(fa);
+					Notification na = new Notification("Application", "Administrator", "Salaries have been paid");
+					Notification ne = new Notification("Application", "Economist","Salaries have been paid");
+					if(!nm.exits(na)) nm.addNotification(na);
+					if(!nm.exits(ne))nm.addNotification(ne);
+				}
 			}
 		}
 		

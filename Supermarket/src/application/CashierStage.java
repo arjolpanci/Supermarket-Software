@@ -1,11 +1,8 @@
 package application;
 
-import java.awt.Desktop;
-import java.io.File;
-import java.io.IOException;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
-
 import data.Bill;
 import data.ProductIO;
 import data.UserIO;
@@ -19,7 +16,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
@@ -437,9 +433,9 @@ public class CashierStage {
 		
 	}
 	
-	private TableView viewBillProducts() {
+	private TableView<Product> viewBillProducts() {
 		
-		TableView billProducts = new TableView();
+		TableView<Product> billProducts = new TableView<Product>();
 		TableColumn<Product, String> column1 = new TableColumn<>("Name");
 		column1.setCellValueFactory(new PropertyValueFactory<>("name"));
 		

@@ -5,7 +5,6 @@ import java.util.ArrayList;
 
 import data.Bill;
 import interfaces.IChecker;
-import util.FlatButton;
 import util.SimpleDate;
 
 public class Cashier extends User implements IChecker, Serializable{
