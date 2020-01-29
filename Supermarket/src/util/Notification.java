@@ -50,7 +50,6 @@ public class Notification implements Serializable{
 		alertIV.setFitHeight(70);
 		alertIV.setFitWidth(70);
 		alertIV.setPreserveRatio(true);
-		//alertIV.setImage(new Image("resources" + File.separator + "alert.png"));
 		alertIV.setImage(new Image(ResourceManager.alertloc.toString()));
 		
 		TextArea msgArea = new TextArea();

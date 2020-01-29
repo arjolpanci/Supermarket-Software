@@ -557,24 +557,41 @@ public class SharedElements {
 					String supplier = supplierField.getSelectionModel().getSelectedItem();
 					if(!pio.doesSupplierExist(supplier)) pio.addSupplier(supplier);
 					int quantity = Integer.parseInt(quantityTField.getText());
+					if(quantity <= 0) {
+						Alert al = new Alert(AlertType.ERROR, "Can't have negative or zero quantity", ButtonType.OK);
+						al.setTitle("Error");
+						al.showAndWait();
+						return;
+					}
 					float buyingprice = Float.parseFloat(buyingpriceTField.getText());
 					float price = Float.parseFloat(priceTField.getText());
+					if(price <= 0) {
+						Alert al = new Alert(AlertType.ERROR, "Can't have zero or negative price", ButtonType.OK);
+						al.setTitle("Error");
+						al.showAndWait();
+						return;
+					}
 					long barcode = Long.parseLong(barcodeTField.getText());
 					flag = pio.addProduct(new Product(name, supplier, quantity, buyingprice, price, barcode, new SimpleDate(dateField.getValue())), true);
 					if(flag == 1) {
 						Alert al = new Alert(AlertType.INFORMATION, "Action performed succesfully", ButtonType.OK);
 						al.showAndWait();	
 						nameTField.clear();
-						supplierField.setValue("");
 						quantityTField.clear();
 						buyingpriceTField.clear();
 						priceTField.clear();
 						barcodeTField.clear();
 						dateField.setValue(null);
 						existingCBox.getItems().remove(1, existingCBox.getItems().size());
+						supplierField.getItems().clear();
 						for(Product p : pio.getProducts()) {
-							if(!p.getName().equals("RESERVED")) existingCBox.getItems().add(p.getName());
+							if(!p.getName().equals("RESERVED")) {
+								existingCBox.getItems().add(p.getName());
+							}else {
+								supplierField.getItems().add(p.getSupplier());
+							}
 						}
+						supplierField.setValue("");
 					}
 				} catch (Exception ex) {
 					Alert al = new Alert(AlertType.ERROR, "One of the data has not been input correctly", ButtonType.OK);
@@ -679,7 +696,19 @@ public class SharedElements {
 						int flag = 1;
 						int oldqty = p.getQuantity();
 						int newqty = Integer.parseInt(qtyTField.getText());
+						if(newqty <= 0) {
+							Alert al = new Alert(AlertType.ERROR, "Can't have zero or negative quantity", ButtonType.OK);
+							al.setTitle("Error");
+							al.showAndWait();
+							return;
+						}
 						float newprice = Float.parseFloat(priceTField.getText());
+						if(newprice <= 0) {
+							Alert al = new Alert(AlertType.ERROR, "Can't have zero or negative price", ButtonType.OK);
+							al.setTitle("Error");
+							al.showAndWait();
+							return;
+						}
 						pio.removeProduct(p);
 						p.setQuantity(newqty);
 						p.setPrice(newprice);
@@ -1127,7 +1156,7 @@ public class SharedElements {
         ScrollPane spane = new ScrollPane();
         spane.setContent(barChart);
         barChart.setPrefWidth(2000);
-        barChart.setPrefHeight(600);
+        barChart.setPrefHeight(500);
         barChart.setMinWidth(2000);
         Label placeHolder = new Label("Please fill-in the date fields to display the graph data");
         placeHolder.setFont(new Font(30));
