@@ -17,6 +17,8 @@ import employees.Economist;
 import employees.User;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
@@ -24,7 +26,9 @@ import javafx.scene.Scene;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.PieChart;
 import javafx.scene.chart.XYChart;
+import javafx.scene.chart.XYChart.Series;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
@@ -43,6 +47,7 @@ import javafx.scene.control.ToolBar;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
@@ -1030,8 +1035,7 @@ public class SharedElements {
         yAxis.setLabel("Net Income");
         
         BarChart<String, Number> barChart = new BarChart<String, Number>(xAxis, yAxis); 
-        XYChart.Series<String, Number> dataSeries = new XYChart.Series<String, Number>();
-        dataSeries.setName("Income for month");
+        barChart.setAnimated(false);
         
         ScrollPane spane = new ScrollPane();
         spane.setContent(barChart);
@@ -1080,22 +1084,53 @@ public class SharedElements {
 					profitLabel.setText("Profit: " + income + "$");
 					netLabel.setText("Net Income: " + total + "$");
 					
-					dataSeries.getData().clear();
 					barChart.getData().clear();
 					
-					ArrayList<Integer> existingMonths = new ArrayList<Integer>();
-					for(FinancialAction fa : sm.getFinances()) {
-						if(fa.getDate().isBetween(from, to)) {
-							if(!existingMonths.contains(fa.getDate().getMonth()) || existingMonths.isEmpty()) {
-								XYChart.Series ds = new XYChart.Series();
-								String mnth = fa.getDate().toLocalDate().getMonth().toString() + " " + fa.getDate().getYear();
-								Float data = sm.getTotalForMonth(fa.getDate().getMonth(), fa.getDate().getYear());
-								ds.getData().add(new XYChart.Data(mnth, data));
-								barChart.getData().add(ds);
-								existingMonths.add(fa.getDate().getMonth());		
-							}
+					while(true) {
+						String mnth = from.getMonth().toString() + " " + from.getYear();
+						Float data = sm.getTotalForMonth(from.getMonthValue(), from.getYear());
+						XYChart.Series ds = new XYChart.Series();
+						ds.getData().add(new XYChart.Data(mnth, data));
+						barChart.getData().add(ds);
+						if(from.getMonthValue() == to.getMonthValue() && from.getYear() == to.getYear()) break;
+						from = from.plusMonths(1);
+					}
+					
+					for(Series<String, Number> data : barChart.getData()) {
+						for(XYChart.Data<String, Number> d : data.getData()) {
+							d.getNode().setOnMousePressed((MouseEvent e) -> {
+								Stage dtlStg = new Stage();
+								dtlStg.initModality(Modality.APPLICATION_MODAL);
+								dtlStg.setTitle("Details");
+								dtlStg.getIcons().add(SharedElements.getIcon().getImage());
+								
+								VBox layout = new VBox(5);
+								layout.setAlignment(Pos.CENTER);
+								
+								float exp = 0;
+								float inc = 0;
+								ObservableList<PieChart.Data> pdata = FXCollections.observableArrayList();
+								for(FinancialAction fa : sm.getFinances()) {
+									if(sm.getTotalForMonth(fa.getDate().getMonth(), fa.getDate().getYear()) 
+											== d.getYValue().floatValue()) {
+										 if(fa.getAmount() <= 0) exp += fa.getAmount();
+										 if(fa.getAmount() > 0) inc += fa.getAmount();
+									}
+								}
+								
+								PieChart.Data expdt = new PieChart.Data("Expenses", exp);
+								PieChart.Data prftdt = new PieChart.Data("Profit", inc);
+								pdata.add(expdt);
+								pdata.add(prftdt);
+								PieChart pie = new PieChart(pdata);
+								layout.getChildren().addAll(SharedElements.getHeader(d.getXValue(), 0, 60), pie);
+								Scene sc = new Scene(layout);
+								dtlStg.setScene(sc);
+								dtlStg.showAndWait();
+							});
 						}
 					}
+					
 					placeHolder.setVisible(false);
 				}catch(NullPointerException ex) {
 					Alert al = new Alert(AlertType.ERROR, "Please fill in the date fields", ButtonType.OK);
@@ -1153,7 +1188,7 @@ public class SharedElements {
 		});
 		
 		
-		Scene saleScene = new Scene(mainWindow, 800, 500);
+		Scene saleScene = new Scene(mainWindow, 1000, 700);
 		saleScene.getStylesheets().add("style.css");
 		saleStage.setScene(saleScene);
 		saleStage.showAndWait();
